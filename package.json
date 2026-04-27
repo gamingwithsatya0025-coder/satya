@@ -1,0 +1,16 @@
+{
+  "name": "idle-wheels",
+  "version": "1.0.0",
+  "description": "IdleWheels Platform",
+  "type": "module",
+  "scripts": {
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "server": "node server.js",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

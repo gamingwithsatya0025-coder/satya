@@ -1,0 +1,21 @@
+<svg width="180" height="40" viewBox="0 0 180 40" xmlns="http://www.w3.org/2000/svg" fill="none">
+  
+  <!-- Car Icon -->
+  <g fill="#2563EB">
+    <path d="M8 22c0-4 3-7 7-7h8l4-4h7c2 0 4 2 4 4v7H8z"/>
+    <circle cx="16" cy="27" r="3"/>
+    <circle cx="32" cy="27" r="3"/>
+  </g>
+
+  <!-- Brand Name -->
+  <text 
+    x="50" 
+    y="26" 
+    font-family="Arial, Helvetica, sans-serif" 
+    font-size="20" 
+    font-weight="700" 
+    fill="#1F2937">
+    IdleWheels
+  </text>
+
+</svg>
