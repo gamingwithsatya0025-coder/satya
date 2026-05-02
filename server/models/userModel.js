@@ -20,7 +20,10 @@ const userSchema = new mongoose.Schema({
   isOwner: { type: Boolean, default: false },
   profilePicture: { type: String, default: "" },
 
-  cartData: { type: Object, default: {} }
+  cartData: { type: Object, default: {} },
+  
+  // Stripe integration
+  stripeCustomerId: { type: String, default: "" }
 }, { minimize: false });
 
 const userModel = mongoose.models.user || mongoose.model('user', userSchema);

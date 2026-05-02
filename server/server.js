@@ -13,6 +13,7 @@ import userRouter from './routes/userRoute.js';
 import carRouter from './routes/carRoute.js';
 import bookingRouter from './routes/bookingRoute.js';
 import chatRouter from './routes/chatRoute.js';
+import paymentRouter from './routes/paymentRoute.js';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -29,6 +30,7 @@ app.use('/api/user', userRouter);
 app.use('/api/car', carRouter);
 app.use('/api/booking', bookingRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/payment', paymentRouter);
 
 const distPath = path.join(__dirname, '../client/dist');
 
