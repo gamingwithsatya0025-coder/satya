@@ -30,189 +30,137 @@ const Contact = () => {
     };
 
     return (
-        <div className='pt-32 md:pt-40 pb-24 px-6 md:px-16 lg:px-24 xl:px-32 min-h-screen relative overflow-hidden'>
-            {/* Ambient Background */}
-            <div className='absolute top-20 left-0 w-[500px] h-[500px] bg-primary/[0.04] blur-[150px] pointer-events-none rounded-full' />
-            <div className='absolute bottom-0 right-0 w-[600px] h-[600px] bg-orange-500/[0.03] blur-[150px] pointer-events-none rounded-full' />
+        <div className='page-container pt-16 pb-32 relative bg-black overflow-hidden'>
+            {/* Elegant Background Accents */}
+            <div className='absolute top-0 right-0 w-[500px] h-[500px] bg-primary/[0.01] blur-[150px] rounded-full pointer-events-none' />
 
-            <motion.div 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className='text-center max-w-2xl mx-auto mb-16 relative z-10'
-            >
-                <Title 
-                    title="Get In Touch" 
-                    subTitle="Have questions? We're here to help you get behind the right wheel. Our concierge team is available 24/7." 
-                />
-            </motion.div>
+            {/* HEADER AREA */}
+            <div className='mb-16 px-4'>
+                <div className='flex flex-col items-start'>
+                    <span className='text-[8px] font-black uppercase tracking-[0.5em] text-primary/60 mb-4'>Concierge</span>
+                    <h2 className='text-3xl md:text-5xl font-black text-white uppercase tracking-tighter mb-4'>Get In Touch</h2>
+                    <p className='text-white/30 text-[10px] md:text-xs font-medium max-w-sm leading-relaxed'>Standing by 24/7 to assist with your premium fleet requirements.</p>
+                </div>
+            </div>
 
-            <div className='grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-14 max-w-[1400px] mx-auto relative z-10'>
+            <div className='grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 max-w-7xl mx-auto px-4 relative z-10'>
                 
-                {/* Form */}
+                {/* Precise Form Section */}
                 <motion.div 
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="show"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className='lg:col-span-3 glass p-8 md:p-12 rounded-[2.5rem] border border-white/5 relative overflow-hidden'
+                    className='lg:col-span-7'
                 >
-                    <div className='absolute inset-0 bg-gradient-to-br from-white/[0.01] to-transparent pointer-events-none' />
-
                     {submitted ? (
-                        <motion.div 
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className='flex flex-col items-center justify-center py-20 text-center relative z-10'
-                        >
-                            <CheckCircle className='w-16 h-16 text-emerald-400 mb-6' />
-                            <h3 className='text-2xl font-black font-heading uppercase tracking-tight mb-3'>Message Sent!</h3>
-                            <p className='text-white/40 text-sm font-medium max-w-sm'>We've received your message and will get back to you within 24 hours.</p>
-                        </motion.div>
+                        <div className='glass-card p-16 rounded-[2.5rem] border border-white/5 text-center'>
+                            <CheckCircle className='w-8 h-8 text-emerald-400 mx-auto mb-6' />
+                            <span className='block text-lg font-black uppercase tracking-tighter text-white mb-2'>Sent</span>
+                            <p className='text-white/20 text-[10px] font-medium'>Response within 24 hours.</p>
+                        </div>
                     ) : (
-                        <form className='space-y-5 relative z-10' onSubmit={handleSubmit}>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                                <motion.div variants={itemVariants} className='space-y-2'>
-                                    <label className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-1 transition-colors ${focusedField === 'name' ? 'text-primary' : 'text-white/30'}`}>
-                                        <User className='w-3 h-3' /> Full Name
-                                    </label>
+                        <form className='space-y-8' onSubmit={handleSubmit}>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                                <div className='space-y-3'>
+                                    <span className={`block text-[7px] font-black uppercase tracking-[0.4em] ml-1 ${focusedField === 'name' ? 'text-primary' : 'text-white/10'}`}>Full Name</span>
                                     <input 
                                         type="text" 
                                         placeholder="John Doe" 
-                                        className={`${inputClasses} h-14 px-5`} 
+                                        className={`${inputClasses} h-14 px-6 font-bold text-sm`} 
                                         onFocus={() => setFocusedField('name')}
                                         onBlur={() => setFocusedField(null)}
                                         required
                                     />
-                                </motion.div>
+                                </div>
 
-                                <motion.div variants={itemVariants} className='space-y-2'>
-                                    <label className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-1 transition-colors ${focusedField === 'email' ? 'text-primary' : 'text-white/30'}`}>
-                                        <Mail className='w-3 h-3' /> Email Address
-                                    </label>
+                                <div className='space-y-3'>
+                                    <span className={`block text-[7px] font-black uppercase tracking-[0.4em] ml-1 ${focusedField === 'email' ? 'text-primary' : 'text-white/10'}`}>Email</span>
                                     <input 
                                         type="email" 
-                                        placeholder="john@example.com" 
-                                        className={`${inputClasses} h-14 px-5`}
+                                        placeholder="concierge@example.com" 
+                                        className={`${inputClasses} h-14 px-6 font-bold text-sm`}
                                         onFocus={() => setFocusedField('email')}
                                         onBlur={() => setFocusedField(null)}
                                         required
                                     />
-                                </motion.div>
+                                </div>
                             </div>
 
-                            <motion.div variants={itemVariants} className='space-y-2'>
-                                <label className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-1 transition-colors ${focusedField === 'subject' ? 'text-primary' : 'text-white/30'}`}>
-                                    <MessageSquare className='w-3 h-3' /> Subject
-                                </label>
+                            <div className='space-y-3'>
+                                <span className={`block text-[7px] font-black uppercase tracking-[0.4em] ml-1 ${focusedField === 'subject' ? 'text-primary' : 'text-white/10'}`}>Subject</span>
                                 <input 
                                     type="text" 
-                                    placeholder="Inquiry about premium fleet rental" 
-                                    className={`${inputClasses} h-14 px-5`}
+                                    placeholder="Fleet Inquiry" 
+                                    className={`${inputClasses} h-14 px-6 font-bold text-sm`}
                                     onFocus={() => setFocusedField('subject')}
                                     onBlur={() => setFocusedField(null)}
                                     required
                                 />
-                            </motion.div>
+                            </div>
 
-                            <motion.div variants={itemVariants} className='space-y-2'>
-                                <label className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] ml-1 transition-colors ${focusedField === 'message' ? 'text-primary' : 'text-white/30'}`}>
-                                    <MessageSquare className='w-3 h-3' /> Your Message
-                                </label>
+                            <div className='space-y-3'>
+                                <span className={`block text-[7px] font-black uppercase tracking-[0.4em] ml-1 ${focusedField === 'message' ? 'text-primary' : 'text-white/10'}`}>Message</span>
                                 <textarea 
                                     rows={5} 
-                                    placeholder="Tell us how we can assist you..." 
-                                    className={`${inputClasses} py-4 px-5 resize-none`}
+                                    placeholder="Your requirements..." 
+                                    className={`${inputClasses} p-6 resize-none font-medium text-sm leading-relaxed`}
                                     onFocus={() => setFocusedField('message')}
                                     onBlur={() => setFocusedField(null)}
                                     required
                                 ></textarea>
-                            </motion.div>
+                            </div>
 
                             <motion.button 
-                                variants={itemVariants}
-                                whileHover={{ scale: 1.01 }}
-                                whileTap={{ scale: 0.99 }}
+                                whileHover={{ backgroundColor: '#6366f1', color: '#fff' }}
                                 type="submit" 
-                                className='w-full h-16 mt-2 rounded-2xl bg-primary hover:bg-secondary text-white font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-3 transition-all relative overflow-hidden group shadow-[0_0_30px_-5px_rgba(245,158,11,0.3)] border border-white/10'
+                                className='w-full h-16 rounded-2xl bg-white text-black font-black uppercase tracking-[0.5em] text-[9px] flex items-center justify-center gap-4 transition-all'
                             >
-                                <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]'></div>
-                                <span className='relative z-10'>Send Transmission</span>
-                                <ArrowRight className='w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform' />
+                                Send Transmission <ArrowRight className='w-4 h-4' />
                             </motion.button>
                         </form>
                     )}
                 </motion.div>
 
-                {/* Right Side */}
+                {/* Sleek Sidebar */}
                 <motion.div 
-                    variants={containerVariants}
-                    initial="hidden"
-                    whileInView="show"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className='lg:col-span-2 space-y-5 flex flex-col'
+                    className='lg:col-span-5 space-y-16'
                 >
-                    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-5'>
-                        <motion.div variants={itemVariants} className='glass p-8 rounded-[2rem] border border-white/5 hover:border-primary/20 transition-all group cursor-default'>
-                            <div className='w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform border border-primary/20'>
-                                <PhoneCall className='w-5 h-5 text-primary' />
-                            </div>
-                            <h4 className='text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2'>VIP Direct Line</h4>
-                            <p className='font-bold text-xl text-white'>+91 98765 43210</p>
-                        </motion.div>
+                    <div className='space-y-12'>
+                        <div className='group border-b border-white/5 pb-8'>
+                            <span className='block text-[7px] font-black uppercase tracking-[0.4em] text-white/20 mb-3'>Direct Line</span>
+                            <span className='block text-xl font-black text-white tracking-tighter group-hover:text-primary transition-colors cursor-pointer'>+91 98765 43210</span>
+                        </div>
 
-                        <motion.div variants={itemVariants} className='glass p-8 rounded-[2rem] border border-white/5 hover:border-primary/20 transition-all group cursor-default'>
-                            <div className='w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform border border-primary/20'>
-                                <Mail className='w-5 h-5 text-primary' />
-                            </div>
-                            <h4 className='text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-2'>Email Concierge</h4>
-                            <p className='font-bold text-lg text-white'>support@idlewheels.com</p>
-                        </motion.div>
+                        <div className='group border-b border-white/5 pb-8'>
+                            <span className='block text-[7px] font-black uppercase tracking-[0.4em] text-white/20 mb-3'>Concierge</span>
+                            <span className='block text-xl font-black text-white tracking-tighter group-hover:text-primary transition-colors cursor-pointer uppercase'>support@idlewheels.com</span>
+                        </div>
                     </div>
 
-                    {/* Location Card */}
-                    <motion.div variants={itemVariants} className='glass p-3 rounded-[2rem] border border-white/5 flex-1 min-h-[220px] relative overflow-hidden group'>
-                        <div className='absolute inset-0 bg-gradient-to-t from-[#030712] via-[#030712]/80 to-[#030712]/40' />
-                        <div className='absolute inset-0 opacity-[0.06]'
-                            style={{
-                                backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                                backgroundSize: '30px 30px'
-                            }}
-                        />
-                        
-                        <div className='relative w-full h-full flex flex-col items-center justify-end text-center p-8 pb-8'>
-                            <motion.div 
-                                animate={{ y: [0, -5, 0] }}
-                                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                                className='w-14 h-14 bg-primary/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-5 border border-primary/30 shadow-[0_0_30px_-5px_rgba(245,158,11,0.4)]'
-                            >
-                                <MapPin className='w-6 h-6 text-primary' />
-                            </motion.div>
-                            <h4 className='text-white font-black uppercase tracking-[0.1em] text-lg mb-1'>Visakhapatnam HQ</h4>
-                            <p className='text-[11px] font-bold uppercase tracking-[0.2em] text-primary/70'>Andhra Pradesh, India</p>
+                    <div className='relative rounded-[2.5rem] overflow-hidden group aspect-[16/10] border border-white/5'>
+                        <img src={assets.car_image1} className='absolute inset-0 w-full h-full object-cover grayscale opacity-10 group-hover:opacity-20 transition-all duration-1000' />
+                        <div className='absolute inset-0 bg-linear-to-t from-black via-transparent to-transparent' />
+                        <div className='absolute bottom-8 left-8'>
+                            <span className='block text-lg font-black text-white tracking-tighter uppercase mb-1'>Visakhapatnam HQ</span>
+                            <span className='text-[7px] font-black uppercase tracking-[0.4em] text-primary/40'>Andhra Pradesh, India</span>
                         </div>
-                    </motion.div>
+                    </div>
 
-                    {/* Social Row */}
-                    <motion.div variants={itemVariants} className='flex items-center gap-3'>
-                        {[
-                            { icon: assets.facebook_logo, label: 'Facebook' },
-                            { icon: assets.twitter_logo, label: 'Twitter' },
-                            { icon: assets.instagram_logo, label: 'Instagram' }
-                        ].map((social, idx) => (
-                            <motion.a 
-                                whileHover={{ y: -4, scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                key={idx} 
-                                href="#" 
-                                title={social.label}
-                                className='flex-1 h-14 glass rounded-2xl flex items-center justify-center border border-white/5 hover:border-primary/30 hover:bg-primary/10 transition-all group'
+                    <div className='flex items-center gap-4'>
+                        {['FB', 'TW', 'IG'].map((social, idx) => (
+                            <a 
+                                key={idx} href="#" 
+                                className='flex-1 h-14 glass-card rounded-xl flex items-center justify-center border border-white/5 text-[8px] font-black uppercase tracking-[0.3em] text-white/10 hover:text-white transition-all'
                             >
-                                <img src={social.icon} alt={social.label} className='w-5 h-5 opacity-30 group-hover:opacity-100 group-hover:invert transition-all duration-300' />
-                            </motion.a>
+                                {social}
+                            </a>
                         ))}
-                    </motion.div>
+                    </div>
                 </motion.div>
+
             </div>
         </div>
     );

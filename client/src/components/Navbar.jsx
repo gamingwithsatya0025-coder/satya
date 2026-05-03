@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { useLocation, Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll } from "framer-motion";
 import { useAppContext } from "../context/AppContext";
 import { Menu, X } from "lucide-react";
 import NavHeader from "./ui/nav-header";
@@ -32,13 +32,11 @@ const Navbar = ({ setShowLogin }) => {
     Promise.resolve().then(() => setOpen(false));
   }, [location]);
 
+  const { scrollYProgress } = useScroll();
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-[9999] transition-all duration-500 ${
-        scrolled 
-          ? "bg-[#030712]/90 backdrop-blur-3xl py-3 border-b border-white/5 shadow-2xl" 
-          : "bg-transparent py-5"
-      } px-6 md:px-16 lg:px-24 flex items-center justify-between`}
+      className="fixed top-0 left-0 right-0 h-[80px] z-50 flex items-center justify-between px-6 md:px-16 lg:px-24 bg-[#030303] border-b border-white/5"
     >
       {/* Logo */}
       <Link to="/" className='flex items-center gap-3 group relative'>
@@ -62,8 +60,13 @@ const Navbar = ({ setShowLogin }) => {
             <Link to="/owner" className="btn-primary !px-5 !py-2.5 !text-[9px] !rounded-xl">
                 Partner Portal
             </Link>
-            <Link title="My Bookings" to="/my-bookings" className="w-10 h-10 rounded-xl glass border-white/10 flex items-center justify-center overflow-hidden hover:border-primary/30 transition-all">
-                <img src={userData?.profilePicture || assets.user_profile} alt="Profile" className="w-full h-full object-cover" />
+            <Link title="My Bookings" to="/my-bookings" className="w-10 h-10 rounded-xl glass border border-white/10 flex items-center justify-center overflow-hidden hover:border-primary/30 transition-all">
+                <img 
+                  src={userData?.profilePicture && userData.profilePicture !== "null" && userData.profilePicture !== "" ? userData.profilePicture : assets.user_profile} 
+                  onError={(e) => { e.target.onerror = null; e.target.src = assets.user_profile; }}
+                  alt="Profile" 
+                  className="w-full h-full object-cover" 
+                />
             </Link>
             <button onClick={logout} className="text-[9px] font-black uppercase tracking-widest text-white/25 hover:text-red-400 transition-colors">
                 Logout

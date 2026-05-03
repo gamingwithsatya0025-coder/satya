@@ -26,16 +26,20 @@ const SkeletonCard = () => (
 const Cars = () => {
   const { cars } = useAppContext();
   const [input, setInput] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCar, setSelectedCar] = useState(null);
   
+  const categories = ['All', 'SUV', 'Sedan', 'Luxury', 'Sports'];
+
   const filteredCars = useMemo(() => {
     if (!cars) return [];
-    return cars.filter(car => 
-      car.brand.toLowerCase().includes(input.toLowerCase()) || 
-      car.model.toLowerCase().includes(input.toLowerCase()) ||
-      car.location.toLowerCase().includes(input.toLowerCase())
-    );
-  }, [input, cars]);
+    return cars.filter(car => {
+      const matchSearch = car.brand.toLowerCase().includes(input.toLowerCase()) || 
+                          car.model.toLowerCase().includes(input.toLowerCase());
+      const matchCategory = selectedCategory === 'All' || car.category === selectedCategory;
+      return matchSearch && matchCategory;
+    });
+  }, [input, cars, selectedCategory]);
 
   const handleMarkerClick = (car) => {
     setSelectedCar(car);
@@ -46,89 +50,105 @@ const Cars = () => {
   };
 
   return (
-    <div className='bg-[#030712] min-h-screen relative overflow-hidden'>
-      <div className="h-32 md:h-48" /> {/* Hard Spacer for Navbar Clearance */}
-      {/* Refined Background Accent */}
-      <div className='absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/[0.05] to-transparent pointer-events-none' />
+    <div className='bg-[#030303] min-h-screen'>
 
-      <div className='pt-10 px-6 md:px-16 lg:px-24 xl:px-32 relative z-10'>
-        {/* Minimalist Professional Header */}
-        <div className='flex flex-col md:flex-row md:items-end justify-between gap-10 mb-14 border-b border-white/5 pb-10'>
-            <div className='space-y-2'>
-                <h1 className='text-2xl md:text-4xl font-black font-heading tracking-tighter uppercase leading-none'>
-                    Our <span className='text-primary italic'>Fleet</span>
-                </h1>
-                <p className='text-[9px] font-bold uppercase tracking-[0.3em] text-white/20'>
-                    {filteredCars.length} Premium vehicles available
-                </p>
-            </div>
+      {/* HERO SECTION */}
+      <div className='px-6 md:px-16 lg:px-24 mb-6 mt-4 max-w-[1600px] mx-auto w-full'>
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          className='space-y-4'
+        >
+          <h1 className='text-4xl md:text-6xl font-black tracking-tight uppercase leading-tight text-white'>
+            Explore <span className='gradient-text-animated italic'>Fleet</span>
+          </h1>
 
-            <div className='w-full max-w-sm group'>
-                <div className='relative flex items-center glass h-11 rounded-xl border-white/5 shadow-2xl px-4 hover:border-primary/20 transition-all'>
-                    <Search className='w-4 h-4 text-white/20 group-hover:text-primary/60 transition-colors mr-4' />
-                    <input 
-                        type="text" 
-                        placeholder='Search brand, model, or city...' 
-                        className='w-full h-full outline-none bg-transparent font-bold placeholder:text-white/10 text-xs text-white' 
-                        onChange={(e) => setInput(e.target.value)} 
-                        value={input} 
-                    />
-                    <div className='flex items-center gap-3 pl-4 border-l border-white/5'>
-                        <SlidersHorizontal className='w-3.5 h-3.5 text-white/20 cursor-pointer hover:text-white' />
-                    </div>
-                </div>
-            </div>
-        </div>
+          <p className='text-sm md:text-base text-white/40 max-w-xl leading-relaxed'>
+            Experience the pinnacle of automotive engineering. Discover our elite collection of {filteredCars.length} luxury vehicles.
+          </p>
+        </motion.div>
+      </div>
 
-        {/* Main Split Layout */}
-        <div className='flex flex-col lg:flex-row gap-12 pb-32'>
-          
-          {/* Car List (Left) */}
-          <div className='w-full lg:w-3/5 lg:max-h-[80vh] lg:overflow-y-auto pr-2 custom-scrollbar'>
-            <AnimatePresence mode='popLayout'>
-              {filteredCars.length > 0 ? (
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-8'>
-                  {filteredCars.map((car, index) => (
-                    <motion.div 
-                      layout
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.4, delay: index * 0.05 }}
-                      key={car._id} 
-                      id={`car-${car._id}`}
-                      onMouseEnter={() => setSelectedCar(car)}
+      {/* STICKY FILTER BAR */}
+      <div className='sticky z-40 bg-[#030303]/95 backdrop-blur-2xl shadow-xl py-4 top-0'>
+        <div className='px-6 md:px-16 lg:px-24 max-w-[1600px] mx-auto flex flex-col md:flex-row gap-6 md:items-center justify-between'>
+            {/* Categories */}
+            <div className='flex gap-3 overflow-x-auto no-scrollbar'>
+                {categories.map(cat => (
+                    <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                            selectedCategory === cat
+                            ? 'bg-primary text-white shadow-lg'
+                            : 'bg-white/5 text-white/40 hover:text-white'
+                        }`}
                     >
-                      <CarCard car={car} />
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <div className='text-center py-40 glass rounded-[3rem] border-white/5'>
-                  <Search className='w-12 h-12 text-white/5 mx-auto mb-6' />
-                  <p className='text-[10px] font-black text-white/20 uppercase tracking-[0.2em]'>No matches found</p>
-                </div>
-              )}
-            </AnimatePresence>
-          </div>
+                        {cat}
+                    </button>
+                ))}
+            </div>
 
-          {/* Map (Right) - The Important Element */}
-          <div className='w-full lg:w-2/5 h-[450px] lg:h-[80vh] sticky top-28'>
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className='w-full h-full rounded-[2.5rem] overflow-hidden border border-white/5 shadow-3xl relative'
-            >
-              <Map 
-                cars={filteredCars} 
-                selectedCar={selectedCar} 
-                onMarkerClick={handleMarkerClick}
-              />
-              <div className='absolute inset-0 pointer-events-none border-[1px] border-white/5 rounded-[2.5rem]' />
-            </motion.div>
-          </div>
+            {/* Search */}
+            <div className='w-full md:w-[300px]'>
+                <div className='flex items-center bg-white/[0.03] px-5 h-11 rounded-xl border border-white/5 focus-within:border-primary/40 transition-all'>
+                    <Search className='w-4 h-4 text-white/20 mr-3' />
+                    <input
+                        type="text"
+                        placeholder="Search vehicles..."
+                        className='bg-transparent outline-none text-xs w-full font-bold placeholder:text-white/10 text-white'
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                    />
+                </div>
+            </div>
         </div>
       </div>
+
+      {/* EXPLORER SECTION */}
+      <div className='flex gap-12 px-6 md:px-16 lg:px-24 max-w-[1600px] mx-auto w-full py-12'>
+        
+        {/* LEFT: VEHICLE GRID */}
+        <div className='w-full lg:w-[60%]'>
+            <AnimatePresence mode='popLayout'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
+                    {filteredCars.map((car, index) => (
+                        <motion.div
+                            key={car._id}
+                            id={`car-${car._id}`}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            onMouseEnter={() => setSelectedCar(car)}
+                        >
+                            <CarCard car={car} />
+                        </motion.div>
+                    ))}
+                </div>
+            </AnimatePresence>
+        </div>
+
+        {/* RIGHT: INTERACTIVE MAP */}
+        <div className='hidden lg:block lg:w-[40%] sticky h-[calc(100vh-120px)] top-[20px]'>
+            <div className='w-full h-full rounded-[3rem] overflow-hidden border border-white/5 relative group'>
+                <Map
+                    cars={filteredCars}
+                    selectedCar={selectedCar}
+                    onMarkerClick={handleMarkerClick}
+                />
+                <div className='absolute top-8 left-8 z-[1000]'>
+                    <div className='glass px-5 py-2.5 rounded-full border-white/10 flex items-center gap-2'>
+                        <div className='w-2 h-2 bg-green-500 rounded-full animate-pulse' />
+                        <span className='text-[9px] font-black uppercase tracking-widest text-white/60'>Active Tracking</span>
+                    </div>
+                </div>
+                <div className='absolute inset-0 pointer-events-none border border-white/5 rounded-[3rem]' />
+            </div>
+        </div>
+
+      </div>
+
+      <div className='fixed bottom-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[200px] rounded-full pointer-events-none z-0' />
     </div>
   )
 }

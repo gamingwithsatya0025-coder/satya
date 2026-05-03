@@ -74,11 +74,15 @@ const Banner = () => {
                 <motion.div
                     animate={{ y: [0, -12, 0] }}
                     transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    style={{
+                        maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)',
+                        WebkitMaskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)'
+                    }}
                 >
                     <img 
                       src={assets.banner_car_image || assets.main_car} 
                       alt="Luxury Car" 
-                      className='w-full object-contain filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)]' 
+                      className='w-full object-contain filter drop-shadow-[0_30px_60px_rgba(0,0,0,0.5)] mix-blend-lighten' 
                     />
                 </motion.div>
                 <div className='absolute -bottom-10 left-1/2 -translate-x-1/2 w-[80%] h-10 bg-primary/15 blur-[40px] rounded-[100%]' />

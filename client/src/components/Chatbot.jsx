@@ -1,15 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Bot, Minus, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
-import { useAppContext } from '../context/AppContext';
+import React, { useState, useRef, useEffect } from "react";
+import { MessageSquare, X, Send, Bot, Minus, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { useAppContext } from "../context/AppContext";
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [msg, setMsg] = useState("");
   const [chat, setChat] = useState([
-    { role: 'bot', text: "Hello! I'm your Idle Wheels Assistant. How can I help you today?" }
+    {
+      role: "bot",
+      text: "Hello! I'm your Idle Wheels Assistant. How can I help you today?",
+    },
   ]);
   const [loading, setLoading] = useState(false);
   const { backendUrl } = useAppContext();
@@ -28,22 +31,34 @@ const Chatbot = () => {
     if (!msg.trim()) return;
 
     const userMessage = msg;
-    setChat(prev => [...prev, { role: 'user', text: userMessage }]);
+    setChat((prev) => [...prev, { role: "user", text: userMessage }]);
     setMsg("");
     setLoading(true);
 
     try {
       const res = await axios.post(`${backendUrl}/api/chat/chat`, {
-        message: userMessage
+        message: userMessage,
       });
 
       if (res.data.success) {
-        setChat(prev => [...prev, { role: 'bot', text: res.data.reply }]);
+        setChat((prev) => [...prev, { role: "bot", text: res.data.reply }]);
       } else {
-        setChat(prev => [...prev, { role: 'bot', text: "I'm having a bit of trouble. Please try again later." }]);
+        setChat((prev) => [
+          ...prev,
+          {
+            role: "bot",
+            text: "I'm having a bit of trouble. Please try again later.",
+          },
+        ]);
       }
     } catch {
-      setChat(prev => [...prev, { role: 'bot', text: "Connection interrupted. Please check your network and try again." }]);
+      setChat((prev) => [
+        ...prev,
+        {
+          role: "bot",
+          text: "Connection interrupted. Please check your network and try again.",
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -58,7 +73,7 @@ const Chatbot = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className={`w-[340px] md:w-[380px] rounded-[2rem] border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col mb-4 bg-[#0a0f1a]/95 backdrop-blur-2xl ${isMinimized ? 'h-[68px]' : 'h-[480px]'}`}
+            className={`w-[340px] md:w-[380px] rounded-[2rem] border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col mb-4 bg-[#0a0f1a]/95 backdrop-blur-2xl ${isMinimized ? "h-[68px]" : "h-[480px]"}`}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-primary to-secondary p-5 flex items-center justify-between">
@@ -67,21 +82,25 @@ const Chatbot = () => {
                   <Bot className="text-white w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-white font-black font-heading text-sm uppercase tracking-tight">Assistant</h3>
+                  <h3 className="text-white font-black font-heading text-sm uppercase tracking-tight">
+                    Assistant
+                  </h3>
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span className="text-[9px] text-white/60 font-bold uppercase tracking-widest">Online</span>
+                    <span className="text-[9px] text-white/60 font-bold uppercase tracking-widest">
+                      Online
+                    </span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <button 
+                <button
                   onClick={() => setIsMinimized(!isMinimized)}
                   className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
                 >
                   <Minus className="text-white w-4 h-4" />
                 </button>
-                <button 
+                <button
                   onClick={() => setIsOpen(false)}
                   className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
                 >
@@ -99,19 +118,28 @@ const Chatbot = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       key={i}
-                      className={`flex ${c.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      className={`flex ${c.role === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      <div className={`max-w-[80%] p-3.5 rounded-2xl text-sm ${
-                        c.role === 'user' 
-                          ? 'bg-primary text-white rounded-br-lg' 
-                          : 'bg-white/5 text-white/80 border border-white/5 rounded-bl-lg'
-                      }`}>
-                        <p className="leading-relaxed">{c.text}</p>
+                      <div
+                        className={`max-w-[80%] p-3.5 rounded-2xl text-sm ${
+                          c.role === "user"
+                            ? "bg-primary text-white rounded-br-lg"
+                            : "bg-white/5 text-white/80 border border-white/5 rounded-bl-lg"
+                        }`}
+                      >
+                        <div
+                          className="leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: c.text }}
+                        />
                       </div>
                     </motion.div>
                   ))}
                   {loading && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex justify-start"
+                    >
                       <div className="bg-white/5 p-3.5 rounded-2xl rounded-bl-lg border border-white/5">
                         <div className="flex gap-1.5">
                           <span className="w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce"></span>
@@ -125,7 +153,10 @@ const Chatbot = () => {
                 </div>
 
                 {/* Input Area */}
-                <form onSubmit={sendMessage} className="p-3 bg-[#0a0f1a] border-t border-white/5 flex gap-2">
+                <form
+                  onSubmit={sendMessage}
+                  className="p-3 bg-[#0a0f1a] border-t border-white/5 flex gap-2"
+                >
                   <input
                     type="text"
                     value={msg}
@@ -133,7 +164,7 @@ const Chatbot = () => {
                     placeholder="Ask about cars, prices..."
                     className="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/15 outline-none focus:border-primary/40 transition-all font-medium"
                   />
-                  <button 
+                  <button
                     type="submit"
                     disabled={loading}
                     className="w-11 h-11 bg-primary rounded-xl flex items-center justify-center hover:bg-secondary transition-all shadow-[0_0_15px_-3px_rgba(245,158,11,0.4)] disabled:opacity-50"
@@ -160,7 +191,7 @@ const Chatbot = () => {
           <div className="absolute inset-0 bg-white/10 rounded-2xl scale-0 group-hover:scale-100 transition-transform duration-300"></div>
           <Sparkles className="text-white w-6 h-6 relative z-10" />
           {/* Notification dot */}
-          <div className='absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#030712] animate-pulse' />
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#030712] animate-pulse" />
         </motion.button>
       )}
     </div>

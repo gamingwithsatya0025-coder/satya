@@ -19,44 +19,12 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-background text-white pt-32 pb-12 px-6 md:px-16 lg:px-24 xl:px-32 border-t border-white/5 relative overflow-hidden">
+    <footer className="bg-background text-white pt-32 pb-12 border-t border-white/5 relative overflow-hidden w-full">
         {/* Ambient glow */}
         <div className='absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 blur-[150px] pointer-events-none rounded-full' />
 
-        <div className="max-w-7xl mx-auto relative z-10">
-            {/* Newsletter Section */}
-            <motion.div 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className='glass p-10 md:p-14 rounded-[2.5rem] border-white/5 mb-20 relative overflow-hidden'
-            >
-                <div className='absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/5 pointer-events-none' />
-                <div className='relative z-10 flex flex-col md:flex-row items-center gap-8'>
-                    <div className='flex-1'>
-                        <h3 className='text-2xl md:text-3xl font-black font-heading uppercase tracking-tight mb-2'>
-                            Stay in the <span className='gradient-text'>Fast Lane</span>
-                        </h3>
-                        <p className='text-white/40 text-sm font-medium'>Get exclusive deals, new fleet additions, and VIP offers delivered to your inbox.</p>
-                    </div>
-                    <form onSubmit={handleSubscribe} className='flex items-center w-full md:w-auto gap-2'>
-                        <div className='relative flex-1 md:w-72'>
-                            <Mail className='absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20' />
-                            <input 
-                                type="email" 
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="your@email.com" 
-                                className='w-full h-14 pl-12 pr-4 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-white/20 outline-none focus:border-primary/50 transition-all'
-                                required
-                            />
-                        </div>
-                        <button type="submit" className='h-14 px-6 bg-primary hover:bg-secondary rounded-xl font-bold text-sm text-white flex items-center gap-2 transition-all whitespace-nowrap'>
-                            {subscribed ? '✓ Subscribed!' : <>Subscribe <ArrowRight className='w-4 h-4' /></>}
-                        </button>
-                    </form>
-                </div>
-            </motion.div>
+        <div className="w-full px-6 md:px-12 lg:px-20 max-w-7xl mx-auto relative z-10">
+
 
             {/* Main Footer Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-16 md:gap-12">

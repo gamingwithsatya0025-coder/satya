@@ -6,6 +6,7 @@ import Title from './Title';
 import { assets } from '../assets/assets';
 import CarCard from './CarCard';
 import { Car, ArrowUpRight } from 'lucide-react';
+import ElegantShape from './ui/ElegantShape';
 
 const SkeletonCard = () => (
     <div className='bg-[#0f172a] rounded-[2rem] overflow-hidden border border-white/5 animate-pulse'>
@@ -34,6 +35,10 @@ const FeaturedSection = () => {
 
   return (
     <section className='section-spacing px-6 md:px-16 lg:px-24 xl:px-32 bg-background relative overflow-hidden'>
+        {/* Geometric Background Shapes */}
+        <ElegantShape delay={0.2} width={400} height={100} rotate={15} gradient="from-primary/[0.1]" className="-left-20 top-20" />
+        <ElegantShape delay={0.4} width={300} height={80} rotate={-10} gradient="from-primary/[0.05]" className="-right-20 bottom-20" />
+        
         {/* Ambient background */}
         <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/[0.02] blur-[200px] rounded-full pointer-events-none' />
 

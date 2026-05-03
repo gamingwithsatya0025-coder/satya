@@ -1,7 +1,7 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion'
 import { Users, Fuel, Settings, MapPin, Star, ArrowUpRight } from 'lucide-react'
 
 const CarCard = ({ car }) => {
@@ -10,14 +10,40 @@ const CarCard = ({ car }) => {
     
     const carImage = car.images && car.images.length > 0 ? car.images[0] : assets.car_icon;
     
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const handleMouseMove = ({ currentTarget, clientX, clientY }) => {
+        let { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    };
+
     return (
         <motion.div 
-            whileHover={{ y: -8 }}
+            onMouseMove={handleMouseMove}
+            whileHover={{ 
+                y: -12,
+                scale: 1.02,
+                boxShadow: "0 40px 80px -15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(99, 102, 241, 0.15)"
+            }}
             onClick={() => { navigate(`/car-details/${car._id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
-            className='group bg-[#0a0f1a] rounded-[2rem] overflow-hidden cursor-pointer shadow-2xl hover:shadow-primary/5 transition-all duration-500 border border-white/5 hover:border-primary/20 relative'
+            className='group bg-[#0a0f1a] rounded-[2.5rem] overflow-hidden cursor-pointer shadow-2xl transition-all duration-700 border border-white/5 hover:border-primary/30 relative card-animation gsap-reveal'
+            data-aos="zoom-in"
         >
-            {/* Hover gradient overlay */}
-            <div className='absolute inset-0 bg-gradient-to-b from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-10 rounded-[2rem]' />
+            {/* Spot light hover effect */}
+            <motion.div
+                className="pointer-events-none absolute -inset-px rounded-[2.5rem] opacity-0 transition duration-300 group-hover:opacity-100"
+                style={{
+                    background: useMotionTemplate`
+                        radial-gradient(
+                            600px circle at ${mouseX}px ${mouseY}px,
+                            rgba(99, 102, 241, 0.15),
+                            transparent 80%
+                        )
+                    `,
+                }}
+            />
 
             {/* Image Container */}
             <div className='relative h-56 overflow-hidden'>

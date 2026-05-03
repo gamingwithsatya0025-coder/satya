@@ -3,20 +3,22 @@
 @import "tailwindcss";
 
 :root {
-  /* Stabilized Balanced Premium Theme */
-  --background: #020617;
+  /* Evolution: True Black & Neon Indigo Premium Theme */
+  --background: #030303;
   --foreground: #f8fafc;
   
   --primary: #6366f1;
   --primary-foreground: #ffffff;
   
-  --secondary: #4f46e5;
+  --secondary: #818cf8;
   --secondary-foreground: #ffffff;
   
-  --card: #0f172a;
+  --accent-warm: #f59e0b; /* Golden Accent for Luxury */
+  
+  --card: #0a0a0a;
   --card-foreground: #f8fafc;
   
-  --muted: #1e293b;
+  --muted: #121212;
   --muted-foreground: #94a3b8;
   
   --accent: #1e1b4b;
@@ -25,18 +27,18 @@
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
   
-  --border: rgba(255, 255, 255, 0.08);
-  --input: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.05);
+  --input: rgba(255, 255, 255, 0.03);
   --ring: #6366f1;
   
-  --radius: 1.25rem;
+  --radius: 1.5rem;
   
   --font-sans: "Outfit", "Inter", sans-serif;
   --font-heading: "Outfit", sans-serif;
   
-  --glass-bg: rgba(15, 23, 42, 0.5); /* Adjusted for better blur visibility */
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-highlight: rgba(255, 255, 255, 0.05); /* Top inner border reflection */
+  --glass-bg: rgba(10, 10, 10, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-highlight: rgba(255, 255, 255, 0.04);
   
   /* Standardized Stacking */
   --z-nav: 1000;
@@ -51,6 +53,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent-warm: var(--accent-warm);
   --color-card: var(--card);
   --color-card-foreground: var(--color-card-foreground);
   --color-muted: var(--muted);
@@ -82,7 +85,8 @@ body {
     background-color: var(--background);
     color: var(--foreground);
     overflow-x: hidden;
-    line-height: 1.6; /* Increased slightly for readability */
+    scroll-behavior: smooth;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -199,7 +203,13 @@ h3 {
 
 /* ===== Layout Utilities ===== */
 .page-container {
-    @apply pt-24 pb-20 px-6 md:px-16 lg:px-24 xl:px-32 max-w-7xl mx-auto min-h-[85vh];
+    @apply pt-0 pb-20 px-6 md:px-16 lg:px-24 xl:px-32 max-w-[1440px] mx-auto min-h-[85vh] relative;
+}
+
+/* Safety rule to prevent decorative elements from overlapping Navbar */
+h1.absolute, h2.absolute {
+    @apply pointer-events-none select-none;
+    z-index: -1 !important;
 }
 
 .section-spacing {
@@ -407,4 +417,27 @@ h3 {
 ::selection {
   background: rgba(99, 102, 241, 0.3);
   color: #e0e7ff;
+}
+
+/* ===== User Requested Animations ===== */
+.card-animation {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-animation:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 1s ease forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

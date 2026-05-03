@@ -53,10 +53,11 @@ app.get(/.*$/, (req, res) => {
   res.sendFile(indexPath);
 });
 
-// Start Server
-app.listen(port, () => {
-  console.log(`Server started on http://localhost:${port}`);
-});
+// Start Server only if not in Vercel
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log(`Server started on http://localhost:${port}`);
+  });
+}
 
-// Keep process alive
-setInterval(() => {}, 10000);
+export default app;

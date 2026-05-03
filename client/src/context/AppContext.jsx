@@ -7,7 +7,7 @@ export const AppProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [userData, setUserData] = useState(JSON.parse(localStorage.getItem("user")) || null);
   const [cars, setCars] = useState([]);
-  const backendUrl = "http://localhost:4000";
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
   // Fetch cars from backend
   const fetchCars = useCallback(async () => {
