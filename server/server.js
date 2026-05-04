@@ -14,6 +14,9 @@ import carRouter from './routes/carRoute.js';
 import bookingRouter from './routes/bookingRoute.js';
 import chatRouter from './routes/chatRoute.js';
 import paymentRouter from './routes/paymentRoute.js';
+import upload from './middleware/multer.js';
+import connectCloudinary from './config/cloudinary.js';
+import { v2 as cloudinary } from 'cloudinary';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -41,6 +44,37 @@ app.use('/api/booking', bookingRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/payment', paymentRouter);
 
+// File Upload Endpoint (Supports local and Cloudinary)
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.json({ success: false, message: "No file uploaded" });
+        }
+
+        // If Cloudinary credentials exist, upload to Cloudinary
+        if (process.env.CLOUDINARY_API_KEY) {
+            const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+                resource_type: "auto",
+                folder: "idlewheels"
+            });
+            
+            // Delete local file after upload
+            fs.unlinkSync(req.file.path);
+            
+            return res.json({ success: true, fileUrl: uploadResult.secure_url });
+        }
+
+        // Fallback to local storage
+        const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+        res.json({ success: true, fileUrl });
+    } catch (error) {
+        res.json({ success: false, message: error.message });
+    }
+});
+
+// Serve uploads folder statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Health Check for Vercel
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'active', database: 'connected', timestamp: new Date() });
@@ -62,7 +96,8 @@ app.get(/.*$/, (req, res) => {
 const startServer = async () => {
     try {
         await connectDB();
-        console.log("SUCCESS: MongoDB connected successfully.");
+        await connectCloudinary();
+        console.log("SUCCESS: MongoDB & Cloudinary connected successfully.");
         
         app.listen(port, () => {
             console.log(`Server started on port ${port}`);

@@ -59,11 +59,32 @@ const AddCar = () => {
             return;
         }
 
+        const uploadFile = async (file) => {
+            if (!file) return null;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await axios.post(`${backendUrl}/api/upload`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data', token }
+                });
+                return res.data.success ? res.data.fileUrl : null;
+            } catch (error) {
+                console.error("Upload error:", error);
+                return null;
+            }
+        };
+
         setLoading(true);
         try {
-            // Mock-passing URLs for demo
-            const imageUrls = images.map((_, i) => `https://placeholder.com/car-image-${i}.png`);
-            const videoUrl = "https://placeholder.com/car-video.mp4";
+            // Upload all images
+            const imageUrls = await Promise.all(images.map(img => uploadFile(img)));
+            const videoUrl = await uploadFile(video);
+
+            if (imageUrls.includes(null) || !videoUrl) {
+                alert("Error uploading media. Please try again.");
+                setLoading(false);
+                return;
+            }
 
             const payload = {
                 ...car,

@@ -98,18 +98,36 @@ const requestVerification = async (req, res) => {
     try {
         const { userId, aadhaarNumber, aadhaarImage, panNumber, panImage, drivingLicenceNumber, drivingLicenceImage } = req.body;
         
+        // Aadhaar Validation (12 digits)
+        const aadhaarRegex = /^\d{12}$/;
+        if (!aadhaarRegex.test(aadhaarNumber)) {
+            return res.json({ success: false, message: "Invalid Aadhaar Number. Must be 12 digits." });
+        }
+
+        // PAN Validation (ABCDE1234F)
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        if (!panRegex.test(panNumber.toUpperCase())) {
+            return res.json({ success: false, message: "Invalid PAN Number. Format: ABCDE1234F" });
+        }
+
+        // Driving Licence Validation (Basic format)
+        const dlRegex = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,11}$/;
+        if (!dlRegex.test(drivingLicenceNumber.toUpperCase())) {
+            return res.json({ success: false, message: "Invalid Driving Licence Number." });
+        }
+
         await userModel.findByIdAndUpdate(userId, { 
             aadhaarNumber, 
             aadhaarImage, 
-            panNumber,
+            panNumber: panNumber.toUpperCase(),
             panImage,
-            drivingLicenceNumber,
+            drivingLicenceNumber: drivingLicenceNumber.toUpperCase(),
             drivingLicenceImage,
-            isVerified: true,
-            verificationStatus: 'approved' 
+            isVerified: false, // Not verified until approved
+            verificationStatus: 'pending' 
         });
 
-        res.json({ success: true, message: "Verification documents auto-approved successfully!" });
+        res.json({ success: true, message: "Verification documents submitted successfully! Awaiting approval." });
     } catch (error) {
         console.error(error);
         res.json({ success: false, message: error.message });

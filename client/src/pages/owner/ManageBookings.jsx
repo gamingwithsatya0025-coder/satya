@@ -9,6 +9,7 @@ const ManageBookings = () => {
     const { userData, backendUrl, token } = useAppContext();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedUser, setSelectedUser] = useState(null);
     const currency = import.meta.env.VITE_CURRENCY;
 
     const fetchAllBookings = useCallback(async () => {
@@ -29,6 +30,20 @@ const ManageBookings = () => {
         }
         setLoading(false);
     }, [backendUrl, token, userData]);
+
+    const updateStatus = async (bookingId, status) => {
+        try {
+            const response = await axios.post(`${backendUrl}/api/booking/status`, { bookingId, status }, { headers: { token } });
+            if (response.data.success) {
+                fetchAllBookings();
+            } else {
+                alert(response.data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error updating status");
+        }
+    }
 
     useEffect(() => {
         Promise.resolve().then(() => fetchAllBookings());
@@ -85,13 +100,91 @@ const ManageBookings = () => {
                                     <p className='text-lg font-black'>{currency}{booking.totalPrice}</p>
                                 </div>
                                 <div className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-widest ${
-                                    booking.status === 'Confirmed' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                                    booking.status === 'Confirmed' ? 'bg-green-500/20 text-green-400' : 
+                                    booking.status === 'Pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'
                                 }`}>
                                     {booking.status}
                                 </div>
                             </div>
+
+                            {booking.status === 'Pending' && (
+                                <div className='lg:col-span-4 flex flex-wrap gap-3 pt-4 border-t border-white/5 mt-2'>
+                                    <button 
+                                        onClick={() => setSelectedUser(booking.user)}
+                                        className='px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10'
+                                    >
+                                        View Credentials
+                                    </button>
+                                    <button 
+                                        onClick={() => updateStatus(booking._id, 'Confirmed')}
+                                        className='px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-green-500/20'
+                                    >
+                                        Approve
+                                    </button>
+                                    <button 
+                                        onClick={() => updateStatus(booking._id, 'Cancelled')}
+                                        className='px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-red-500/20'
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            )}
                         </motion.div>
                     ))}
+                </div>
+            )}
+
+            {/* Credentials Modal */}
+            {selectedUser && (
+                <div className='fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4' onClick={() => setSelectedUser(null)}>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className='glass w-full max-w-2xl rounded-[2.5rem] p-8 border border-white/10 relative'
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button onClick={() => setSelectedUser(null)} className='absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors'>
+                            <img src={assets.close_icon} alt="" className='w-3 h-3 invert opacity-50' />
+                        </button>
+
+                        <h3 className='text-2xl font-black mb-6 uppercase tracking-tighter'>Customer Credentials</h3>
+                        
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+                            <div className='space-y-4'>
+                                <div>
+                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Customer Name</p>
+                                    <p className='font-bold'>{selectedUser.name}</p>
+                                </div>
+                                <div>
+                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Verification Status</p>
+                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${
+                                        selectedUser.verificationStatus === 'approved' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
+                                    }`}>
+                                        {selectedUser.verificationStatus}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className='space-y-4'>
+                                <div>
+                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Aadhaar Number</p>
+                                    <p className='font-mono text-sm tracking-widest'>{selectedUser.aadhaarNumber || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Driving Licence</p>
+                                    <p className='font-mono text-sm tracking-widest uppercase'>{selectedUser.drivingLicenceNumber || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>PAN Number</p>
+                                    <p className='font-mono text-sm tracking-widest uppercase'>{selectedUser.panNumber || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='mt-8 pt-8 border-t border-white/5 text-[10px] text-white/30 uppercase tracking-[0.2em] leading-relaxed'>
+                            Note: Credentials have been pre-validated via regex patterns. Please verify the document numbers match your records if necessary.
+                        </div>
+                    </motion.div>
                 </div>
             )}
         </div>

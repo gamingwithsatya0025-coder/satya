@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Title from '../../components/owner/Title';
-import { ShieldCheck, CreditCard, FileText, Upload, Loader2, CheckCircle } from 'lucide-react';
+import { ShieldCheck, CreditCard, FileText, Upload, Loader2, CheckCircle, Fingerprint, Lock, ShieldAlert, Sparkles, X } from 'lucide-react';
 import { assets } from '../../assets/assets';
 
 const VerifyIdentity = () => {
@@ -16,26 +16,67 @@ const VerifyIdentity = () => {
     const [panNumber, setPanNumber] = useState('');
     const [drivingLicenceNumber, setDrivingLicenceNumber] = useState('');
 
+    const [aadhaarFile, setAadhaarFile] = useState(null);
+    const [panFile, setPanFile] = useState(null);
+    const [dlFile, setDlFile] = useState(null);
+
+    const [aadhaarPreview, setAadhaarPreview] = useState(null);
+    const [panPreview, setPanPreview] = useState(null);
+    const [dlPreview, setDlPreview] = useState(null);
+
+    const handleFileChange = (e, setter, previewSetter) => {
+        const file = e.target.files[0];
+        if (file) {
+            setter(file);
+            previewSetter(URL.createObjectURL(file));
+        }
+    };
+
+    const uploadFile = async (file) => {
+        if (!file) return null;
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const res = await axios.post(`${backendUrl}/api/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data', token }
+            });
+            return res.data.success ? res.data.fileUrl : null;
+        } catch (error) {
+            console.error("Upload error:", error);
+            return null;
+        }
+    };
+
     const handleVerify = async (e) => {
         e.preventDefault();
         setVerifying(true);
         try {
-            const dummyImage = "https://placeholder.com/doc.png";
+            // Upload images first
+            const aadhaarImageUrl = await uploadFile(aadhaarFile);
+            const panImageUrl = await uploadFile(panFile);
+            const dlImageUrl = await uploadFile(dlFile);
+
+            if (!aadhaarImageUrl || !panImageUrl || !dlImageUrl) {
+                alert("Please upload all required documents.");
+                setVerifying(false);
+                return;
+            }
+
             const response = await axios.post(`${backendUrl}/api/user/verify-request`, {
                 userId: userData.id,
                 aadhaarNumber,
-                aadhaarImage: dummyImage,
+                aadhaarImage: aadhaarImageUrl,
                 panNumber,
-                panImage: dummyImage,
+                panImage: panImageUrl,
                 drivingLicenceNumber,
-                drivingLicenceImage: dummyImage
+                drivingLicenceImage: dlImageUrl
             }, { headers: { token } });
 
             if (response.data.success) {
-                const updatedUser = { ...userData, verificationStatus: 'approved' };
+                const updatedUser = { ...userData, verificationStatus: 'pending' };
                 setUserData(updatedUser);
                 localStorage.setItem('user', JSON.stringify(updatedUser));
-                alert("Identity Verified Successfully!");
+                alert("Identity Submitted Successfully! Awaiting approval.");
                 navigate('/owner');
             } else {
                 alert(response.data.message);
@@ -47,188 +88,236 @@ const VerifyIdentity = () => {
         setVerifying(false);
     };
 
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.2
-            }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { opacity: 0, y: 30 },
-        show: { 
-            opacity: 1, 
-            y: 0, 
-            transition: { 
-                duration: 0.8, 
-                ease: [0.22, 1, 0.36, 1] 
-            } 
-        }
-    };
+    const cardClasses = "glass p-8 rounded-[2.5rem] border border-white/5 hover:border-primary/20 transition-all duration-500 group relative overflow-hidden";
+    const inputClasses = "w-full h-16 bg-black/40 border border-white/10 px-6 rounded-2xl font-black tracking-[0.2em] outline-none focus:border-primary text-white transition-all placeholder:text-white/10 text-lg mb-4";
+    const uploadAreaClasses = "w-full h-32 border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all relative overflow-hidden";
 
     return (
         <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className='px-4 py-12 md:px-10 lg:px-16 flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar h-screen bg-[#030303]'
+            className='px-4 py-12 md:px-10 lg:px-16 flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar h-screen bg-[#030303] pb-32'
         >
-            <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                className='flex items-center justify-between mb-12'
-            >
-                <Title title="Identity Verification" subTitle="Complete your Aadhaar and document verification to unlock all features." />
-            </motion.div>
-            
-            <motion.div 
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                className='mt-4'
-            >
-                <motion.form 
-                    onSubmit={handleVerify} 
-                    className='glass p-10 md:p-14 lg:p-20 rounded-[4rem] border border-white/5 premium-shadow relative overflow-hidden'
-                >
-                    {/* Background Decorative Elements */}
-                    <motion.div 
-                        animate={{ 
-                            scale: [1, 1.1, 1],
-                            opacity: [0.1, 0.15, 0.1]
-                        }}
-                        transition={{ duration: 8, repeat: Infinity }}
-                        className='absolute -right-32 -top-32 w-96 h-96 bg-primary/20 rounded-full blur-[120px] pointer-events-none'
-                    />
-                    <motion.div 
-                        animate={{ 
-                            scale: [1, 1.2, 1],
-                            opacity: [0.05, 0.1, 0.05]
-                        }}
-                        transition={{ duration: 10, repeat: Infinity, delay: 1 }}
-                        className='absolute -left-32 -bottom-32 w-96 h-96 bg-accent-warm/10 rounded-full blur-[120px] pointer-events-none'
-                    />
-                    
-                    <motion.div variants={itemVariants} className='mb-16 flex flex-col items-center text-center relative z-10'>
-                        <div className='relative group'>
-                            <div className='absolute inset-0 bg-accent-warm/20 blur-2xl rounded-full scale-150 group-hover:scale-[2] transition-transform duration-700' />
-                            <div className='w-24 h-24 bg-zinc-950 border border-white/10 rounded-[2rem] flex items-center justify-center mb-8 relative z-10 shadow-2xl group-hover:border-accent-warm/50 transition-colors duration-500'>
-                                <ShieldCheck className='w-12 h-12 text-accent-warm' />
-                            </div>
-                        </div>
-                        <h2 className='text-3xl md:text-5xl font-black font-heading uppercase tracking-tighter leading-none'>
-                            Secure Identity <span className='text-accent-warm italic'>Authorization</span>
-                        </h2>
-                        <div className='flex items-center gap-3 mt-5'>
-                            <div className='w-2 h-2 rounded-full bg-emerald-500 animate-pulse' />
-                            <p className='text-white/30 text-[10px] font-black uppercase tracking-[0.4em]'>Verified Partner Protocol v2.0</p>
-                        </div>
-                    </motion.div>
+            <div className='flex flex-col md:flex-row items-center justify-between mb-16 gap-8'>
+                <Title title="Identity Hub" subTitle="Securely authorize your identity to start listing vehicles." />
+                
+                <div className='flex items-center gap-4 glass px-6 py-4 rounded-3xl border-emerald-500/20'>
+                    <div className='w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center'>
+                        <Lock className='w-6 h-6 text-emerald-500' />
+                    </div>
+                    <div>
+                        <p className='text-[10px] font-black uppercase tracking-widest text-emerald-500'>End-to-End Encrypted</p>
+                        <p className='text-[8px] font-bold text-white/40 uppercase tracking-widest'>Your data is protected by IdleWheels Shield</p>
+                    </div>
+                </div>
+            </div>
 
-                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 relative z-10'>
-                        {/* Aadhaar Section */}
-                        <motion.div variants={itemVariants} className='space-y-6 bg-white/[0.01] p-10 rounded-[3rem] border border-white/5 hover:border-primary/20 transition-all duration-500 group'>
-                            <label className='flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2'>
-                                <div className='p-2 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors'><CreditCard className='w-4 h-4 text-primary' /></div>
-                                Aadhaar Identification
-                            </label>
+            <form onSubmit={handleVerify} className='space-y-8'>
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+                    {/* Aadhaar Card */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={cardClasses}>
+                        <div className='absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity'>
+                            <Fingerprint className='w-20 h-20' />
+                        </div>
+                        <div className='relative z-10'>
+                            <div className='flex items-center gap-3 mb-8'>
+                                <div className='w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20'>
+                                    <CreditCard className='w-5 h-5 text-primary' />
+                                </div>
+                                <h3 className='text-xl font-black uppercase tracking-tighter'>Aadhaar ID</h3>
+                            </div>
+                            
                             <input 
                                 type='text' 
                                 required 
-                                maxLength="12" 
+                                pattern="^\d{12}$"
+                                title="Aadhaar must be 12 digits"
                                 onChange={(e) => setAadhaarNumber(e.target.value)} 
                                 value={aadhaarNumber} 
-                                className='w-full h-18 bg-zinc-950/60 border border-white/10 px-8 rounded-2xl font-black tracking-[0.4em] outline-none focus:border-primary text-white transition-all placeholder:text-white/5 text-xl' 
+                                className={inputClasses} 
                                 placeholder='0000 0000 0000' 
                             />
-                            <div className='w-full h-18 bg-zinc-950/40 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all group/upload overflow-hidden relative'>
-                                <input type='file' className='hidden' id='aadhaar-upload' />
-                                <label htmlFor='aadhaar-upload' className='flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.25em] text-white/30 cursor-pointer w-full h-full justify-center group-hover/upload:text-white transition-colors relative z-10'>
-                                    <Upload className='w-5 h-5' /> Upload Document Image
-                                </label>
-                            </div>
-                        </motion.div>
 
-                        {/* PAN Section */}
-                        <motion.div variants={itemVariants} className='space-y-6 bg-white/[0.01] p-10 rounded-[3rem] border border-white/5 hover:border-primary/20 transition-all duration-500 group'>
-                            <label className='flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2'>
-                                <div className='p-2 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors'><FileText className='w-4 h-4 text-primary' /></div>
-                                Permanent Account Number
-                            </label>
+                            <div className={uploadAreaClasses}>
+                                <input type='file' className='hidden' id='aadhaar-upload' accept="image/*" onChange={(e) => handleFileChange(e, setAadhaarFile, setAadhaarPreview)} />
+                                {aadhaarPreview ? (
+                                    <div className='absolute inset-0 group/preview'>
+                                        <img src={aadhaarPreview} className='w-full h-full object-cover' alt="" />
+                                        <div className='absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 flex items-center justify-center transition-all'>
+                                            <p className='text-[10px] font-black uppercase tracking-widest text-white'>Change Image</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label htmlFor='aadhaar-upload' className='flex flex-col items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 cursor-pointer'>
+                                        <Upload className='w-6 h-6 mb-1' />
+                                        Upload Document
+                                    </label>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* PAN Card */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={cardClasses}>
+                         <div className='absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity'>
+                            <FileText className='w-20 h-20' />
+                        </div>
+                        <div className='relative z-10'>
+                            <div className='flex items-center gap-3 mb-8'>
+                                <div className='w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center border border-amber-500/20'>
+                                    <Sparkles className='w-5 h-5 text-amber-500' />
+                                </div>
+                                <h3 className='text-xl font-black uppercase tracking-tighter'>PAN Number</h3>
+                            </div>
+                            
                             <input 
                                 type='text' 
                                 required 
-                                maxLength="10" 
+                                pattern="^[A-Z]{5}[0-9]{4}[A-Z]{1}$"
+                                title="PAN format: ABCDE1234F"
                                 onChange={(e) => setPanNumber(e.target.value)} 
                                 value={panNumber} 
-                                className='w-full h-18 bg-zinc-950/60 border border-white/10 px-8 rounded-2xl font-black tracking-[0.4em] outline-none focus:border-primary text-white transition-all placeholder:text-white/5 uppercase text-xl' 
+                                className={`${inputClasses} uppercase`} 
                                 placeholder='ABCDE1234F' 
                             />
-                            <div className='w-full h-18 bg-zinc-950/40 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all group/upload overflow-hidden relative'>
-                                <input type='file' className='hidden' id='pan-upload' />
-                                <label htmlFor='pan-upload' className='flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.25em] text-white/30 cursor-pointer w-full h-full justify-center group-hover/upload:text-white transition-colors relative z-10'>
-                                    <Upload className='w-5 h-5' /> Upload PAN Copy
-                                </label>
-                            </div>
-                        </motion.div>
 
-                        {/* DL Section - Full Width on Desktop */}
-                        <motion.div variants={itemVariants} className='lg:col-span-2 space-y-6 bg-white/[0.01] p-10 rounded-[3rem] border border-white/5 hover:border-primary/20 transition-all duration-500 group'>
-                            <label className='flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.25em] text-white/40 mb-2'>
-                                <div className='p-2 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors'><ShieldCheck className='w-4 h-4 text-primary' /></div>
-                                Driving Licence Credentials
-                            </label>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                                <input 
-                                    type='text' 
-                                    required 
-                                    maxLength="16" 
-                                    onChange={(e) => setDrivingLicenceNumber(e.target.value)} 
-                                    value={drivingLicenceNumber} 
-                                    className='w-full h-18 bg-zinc-950/60 border border-white/10 px-8 rounded-2xl font-black tracking-[0.4em] outline-none focus:border-primary text-white transition-all placeholder:text-white/5 uppercase text-xl' 
-                                    placeholder='DL-00000000000' 
-                                />
-                                <div className='w-full h-18 bg-zinc-950/40 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-all group/upload overflow-hidden relative'>
-                                    <input type='file' className='hidden' id='dl-upload' />
-                                    <label htmlFor='dl-upload' className='flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.25em] text-white/30 cursor-pointer w-full h-full justify-center group-hover/upload:text-white transition-colors relative z-10'>
-                                        <Upload className='w-5 h-5' /> Upload Licence Copy
-                                    </label>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    <motion.div variants={itemVariants} className='mt-20 relative z-10'>
-                        <button 
-                            disabled={verifying} 
-                            type='submit' 
-                            className='w-full h-24 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-[0.4em] text-sm rounded-[2.5rem] flex items-center justify-center gap-6 transition-all shadow-[0_30px_60px_-10px_rgba(99,102,241,0.4)] border border-white/20 relative overflow-hidden group/btn'
-                        >
-                            <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_2s_infinite] pointer-events-none'></div>
-                            <span className='relative z-10 flex items-center gap-5'>
-                                {verifying ? (
-                                    <>
-                                        <Loader2 className='w-8 h-8 animate-spin' />
-                                        AUTHENTICATING...
-                                    </>
+                            <div className={uploadAreaClasses}>
+                                <input type='file' className='hidden' id='pan-upload' accept="image/*" onChange={(e) => handleFileChange(e, setPanFile, setPanPreview)} />
+                                {panPreview ? (
+                                    <div className='absolute inset-0 group/preview'>
+                                        <img src={panPreview} className='w-full h-full object-cover' alt="" />
+                                        <div className='absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 flex items-center justify-center transition-all'>
+                                            <p className='text-[10px] font-black uppercase tracking-widest text-white'>Change Image</p>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <>
-                                        <CheckCircle className='w-8 h-8' />
-                                        AUTHORIZE & COMPLETE VERIFICATION
-                                    </>
+                                    <label htmlFor='pan-upload' className='flex flex-col items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 cursor-pointer'>
+                                        <Upload className='w-6 h-6 mb-1' />
+                                        Upload PAN Copy
+                                    </label>
                                 )}
-                            </span>
-                        </button>
-                        <p className='text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/20 mt-10 max-w-lg mx-auto leading-relaxed'>
-                            Identity verification is processed through encrypted channels. Data is not stored on our primary servers for enhanced privacy.
-                        </p>
+                            </div>
+                        </div>
                     </motion.div>
-                </motion.form>
-            </motion.div>
+
+                    {/* DL Card */}
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={cardClasses}>
+                         <div className='absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity'>
+                            <ShieldCheck className='w-20 h-20' />
+                        </div>
+                        <div className='relative z-10'>
+                            <div className='flex items-center gap-3 mb-8'>
+                                <div className='w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20'>
+                                    <ShieldCheck className='w-5 h-5 text-indigo-500' />
+                                </div>
+                                <h3 className='text-xl font-black uppercase tracking-tighter'>Driving Licence</h3>
+                            </div>
+                            
+                            <input 
+                                type='text' 
+                                required 
+                                pattern="^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,11}$"
+                                title="Invalid DL Format"
+                                onChange={(e) => setDrivingLicenceNumber(e.target.value)} 
+                                value={drivingLicenceNumber} 
+                                className={`${inputClasses} uppercase`} 
+                                placeholder='DL-00000000000' 
+                            />
+
+                            <div className={uploadAreaClasses}>
+                                <input type='file' className='hidden' id='dl-upload' accept="image/*" onChange={(e) => handleFileChange(e, setDlFile, setDlPreview)} />
+                                {dlPreview ? (
+                                    <div className='absolute inset-0 group/preview'>
+                                        <img src={dlPreview} className='w-full h-full object-cover' alt="" />
+                                        <div className='absolute inset-0 bg-black/60 opacity-0 group-hover/preview:opacity-100 flex items-center justify-center transition-all'>
+                                            <p className='text-[10px] font-black uppercase tracking-widest text-white'>Change Image</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label htmlFor='dl-upload' className='flex flex-col items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 cursor-pointer'>
+                                        <Upload className='w-6 h-6 mb-1' />
+                                        Upload Licence Copy
+                                    </label>
+                                )}
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className='pt-12 flex justify-center'
+                >
+                    <motion.button 
+                        whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(99,102,241,0.6)" }}
+                        whileTap={{ scale: 0.98 }}
+                        disabled={verifying} 
+                        type='submit' 
+                        className='px-16 h-18 bg-primary hover:bg-primary/90 text-white font-black uppercase tracking-[0.3em] text-xs rounded-[2rem] flex items-center justify-center gap-6 transition-all shadow-[0_20px_40px_-10px_rgba(99,102,241,0.4)] border border-white/20 relative overflow-hidden group/btn disabled:opacity-50'
+                    >
+                        {verifying ? (
+                            <>
+                                <Loader2 className='w-6 h-6 animate-spin' />
+                                SECURING DATA...
+                            </>
+                        ) : (
+                            <>
+                                <CheckCircle className='w-6 h-6 group-hover:rotate-12 transition-transform' />
+                                FINALIZE IDENTITY AUTHORIZATION
+                            </>
+                        )}
+                        <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_2s_infinite] pointer-events-none' />
+                    </motion.button>
+                </motion.div>
+                    
+                    {/* Disclaimer & Trust Badges */}
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className='mt-16 relative'
+                    >
+                        {/* Disclaimer Box */}
+                        <div className='max-w-2xl mx-auto glass p-6 rounded-2xl border-white/5 bg-white/[0.02] mb-12'>
+                            <div className='flex items-start gap-4'>
+                                <ShieldAlert className='w-5 h-5 text-amber-500/40 shrink-0 mt-1' />
+                                <p className='text-[10px] font-bold uppercase tracking-[0.15em] text-white/20 leading-relaxed text-center'>
+                                    By finalizing, you agree to our <span className='text-white/40 underline cursor-pointer hover:text-white transition-colors'>Identity Verification Terms</span>. 
+                                    Any attempt to submit fraudulent documents will result in immediate and permanent account termination under the <span className='text-white/40'>IdleWheels Security Protocol</span>.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Trust Badges & Steps Indicator */}
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto border-t border-white/5 pt-12 opacity-40 hover:opacity-100 transition-opacity duration-700'>
+                            <div className='flex flex-col items-center text-center'>
+                                <div className='w-10 h-10 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10'>
+                                    <Lock className='w-4 h-4 text-white/40' />
+                                </div>
+                                <h4 className='text-[9px] font-black uppercase tracking-widest text-white/60 mb-2'>AES-256 Encryption</h4>
+                                <p className='text-[8px] font-bold text-white/20 uppercase tracking-widest'>Military-grade data protection</p>
+                            </div>
+                            
+                            <div className='flex flex-col items-center text-center'>
+                                <div className='w-10 h-10 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10'>
+                                    <Fingerprint className='w-4 h-4 text-white/40' />
+                                </div>
+                                <h4 className='text-[9px] font-black uppercase tracking-widest text-white/60 mb-2'>Identity Shield</h4>
+                                <p className='text-[8px] font-bold text-white/20 uppercase tracking-widest'>Biometric Cross-Reference</p>
+                            </div>
+
+                            <div className='flex flex-col items-center text-center'>
+                                <div className='w-10 h-10 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10'>
+                                    <ShieldCheck className='w-4 h-4 text-white/40' />
+                                </div>
+                                <h4 className='text-[9px] font-black uppercase tracking-widest text-white/60 mb-2'>GDPR Compliant</h4>
+                                <p className='text-[8px] font-bold text-white/20 uppercase tracking-widest'>Privacy-first architecture</p>
+                            </div>
+                        </div>
+                    </motion.div>
+            </form>
         </motion.div>
     );
 };
