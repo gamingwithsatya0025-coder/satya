@@ -20,8 +20,16 @@ const port = process.env.PORT || 4000;
 
 // Enhanced Middleware for Production
 app.use(express.json());
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "https://idlewheels.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175"
+].filter(Boolean);
+
 app.use(cors({
-    origin: ["https://idlewheels.vercel.app", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    origin: allowedOrigins,
     credentials: true
 }));
 
@@ -55,11 +63,9 @@ const startServer = async () => {
         await connectDB();
         console.log("SUCCESS: MongoDB connected successfully.");
         
-        if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-            app.listen(port, () => {
-                console.log(`Server started on http://localhost:${port}`);
-            });
-        }
+        app.listen(port, () => {
+            console.log(`Server started on port ${port}`);
+        });
     } catch (error) {
         console.error("FATAL ERROR: Could not connect to MongoDB:", error.message);
     }
