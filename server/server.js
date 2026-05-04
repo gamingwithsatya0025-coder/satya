@@ -22,6 +22,7 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 const allowedOrigins = [
     process.env.FRONTEND_URL,
+    "https://satya-fqcs.vercel.app",
     "https://idlewheels.vercel.app",
     "http://localhost:5173",
     "http://localhost:5174",
