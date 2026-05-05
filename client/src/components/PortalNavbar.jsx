@@ -18,11 +18,8 @@ const PortalNavbar = () => {
 
   return (
     <div className='flex items-center justify-between px-8 py-5 glass border-b border-white/10 sticky top-0 z-[100] backdrop-blur-2xl'>
-      <Link to='/' className='flex items-center gap-3 group'>
-        <div className='w-10 h-10 rounded-xl bg-primary flex items-center justify-center premium-shadow group-hover:rotate-12 transition-transform duration-500'>
-            <img src={assets.logo} className='w-6 h-6 brightness-0 invert' alt="Logo" />
-        </div>
-        <span className='text-xl font-black tracking-tighter text-white uppercase'>
+      <Link to='/' className='flex items-center group'>
+        <span className='text-2xl font-black tracking-tighter text-white uppercase'>
             Idle<span className='text-primary'>Wheels</span>
         </span>
       </Link>

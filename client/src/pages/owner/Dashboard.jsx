@@ -53,7 +53,18 @@ const Dashboard = () => {
   return (
     <div className='flex-1 h-screen overflow-y-auto custom-scrollbar'>
       <div className='px-6 pt-12 pb-20 md:px-10 lg:px-16 max-w-7xl mx-auto'>
-      <PortalTitle title="Fleet Overview" subTitle="Comprehensive insights into your vehicle performance and rental analytics." />
+      <div className='flex flex-col md:flex-row md:items-center justify-between gap-6'>
+        <PortalTitle title="Fleet Overview" subTitle="Comprehensive insights into your vehicle performance and rental analytics." />
+        <button 
+            onClick={() => navigate('/owner/add-car')}
+            className='h-14 px-8 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center justify-center gap-3'
+        >
+            <div className='w-5 h-5 rounded-lg bg-white/20 flex items-center justify-center'>
+                <span className='text-lg'>+</span>
+            </div>
+            List New Car
+        </button>
+      </div>
       
       {loading ? (
         <div className='py-20 flex justify-center'>
@@ -61,44 +72,6 @@ const Dashboard = () => {
         </div>
       ) : (
         <div className='space-y-12 mt-8'>
-            {/* Verification Status Card */}
-            {!userData?.verificationStatus || userData?.verificationStatus !== 'approved' ? (
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className='glass p-8 rounded-[2.5rem] border border-primary/20 bg-primary/5 mb-10 flex flex-col md:flex-row items-center justify-between gap-6'
-                >
-                    <div className='flex items-center gap-6'>
-                        <div className='w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center border border-primary/30'>
-                            <img src={assets.cautionIconColored} className='w-8 h-8' alt="" />
-                        </div>
-                        <div>
-                            <h3 className='text-xl font-black font-heading'>Account Verification Required</h3>
-                            <p className='text-sm text-white/50'>Please complete your Aadhaar verification to enable car booking features.</p>
-                        </div>
-                    </div>
-                    <button 
-                        onClick={() => navigate('/owner/verify-identity')} 
-                        className='px-8 h-14 bg-primary text-white font-black uppercase tracking-widest text-[10px] rounded-xl hover:scale-105 transition-transform'
-                    >
-                        Verify Identity
-                    </button>
-                </motion.div>
-            ) : (
-                <motion.div 
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className='glass p-6 rounded-3xl border border-green-500/20 bg-green-500/5 mb-10 flex items-center gap-4'
-                >
-                    <div className='w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center border border-green-500/30'>
-                        <img src={assets.tick_icon} className='w-5 h-5' alt="" />
-                    </div>
-                    <div>
-                        <p className='text-[10px] font-bold uppercase tracking-widest text-green-500'>Identity Verified</p>
-                        <p className='text-xs text-white/50'>Your account is fully verified and ready for all platform features.</p>
-                    </div>
-                </motion.div>
-            )}
 
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6'>
                 {stats.map((stat, index) => (
@@ -166,17 +139,24 @@ const Dashboard = () => {
                         {currency}{bookings.reduce((acc, b) => acc + (b.totalPrice || 0), 0)}
                     </h2>
                     <p className='text-[10px] font-bold uppercase tracking-widest text-green-500/60'>Revenue Overview</p>
-                    <div className='mt-8 pt-8 border-t border-white/5 w-full flex items-center justify-center gap-6'>
-                        <div className='text-center'>
-                            <p className='text-[9px] font-black text-white/20 uppercase tracking-widest mb-1'>Net Profit</p>
-                            <p className='text-sm font-bold text-white/60'>92%</p>
+                    
+                    {bookings.reduce((acc, b) => acc + (b.totalPrice || 0), 0) > 0 && (
+                        <div className='mt-8 pt-8 border-t border-white/5 w-full flex items-center justify-center gap-6'>
+                            <div className='text-center'>
+                                <p className='text-[9px] font-black text-white/20 uppercase tracking-widest mb-1'>Net Profit (92%)</p>
+                                <p className='text-sm font-bold text-white/60'>
+                                    {currency}{Math.floor(bookings.reduce((acc, b) => acc + (b.totalPrice || 0), 0) * 0.92)}
+                                </p>
+                            </div>
+                            <div className='w-[1px] h-6 bg-white/5'></div>
+                            <div className='text-center'>
+                                <p className='text-[9px] font-black text-white/20 uppercase tracking-widest mb-1'>Tax (8%)</p>
+                                <p className='text-sm font-bold text-white/60'>
+                                    {currency}{Math.floor(bookings.reduce((acc, b) => acc + (b.totalPrice || 0), 0) * 0.08)}
+                                </p>
+                            </div>
                         </div>
-                        <div className='w-[1px] h-6 bg-white/5'></div>
-                        <div className='text-center'>
-                            <p className='text-[9px] font-black text-white/20 uppercase tracking-widest mb-1'>Tax rate</p>
-                            <p className='text-sm font-bold text-white/60'>8%</p>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

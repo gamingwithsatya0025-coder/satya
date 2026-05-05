@@ -121,14 +121,13 @@ const Chatbot = () => {
                       className={`flex ${c.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`max-w-[80%] p-3.5 rounded-2xl text-sm ${
+                        className={`max-w-[88%] px-8 py-4 rounded-[2rem] text-sm break-words leading-relaxed font-semibold ${
                           c.role === "user"
-                            ? "bg-primary text-white rounded-br-lg"
-                            : "bg-white/5 text-white/80 border border-white/5 rounded-bl-lg"
+                            ? "bg-primary text-white rounded-br-none shadow-[0_15px_30px_-10px_rgba(245,158,11,0.4)]"
+                            : "bg-white/10 text-white border border-white/10 rounded-bl-none shadow-2xl"
                         }`}
                       >
                         <div
-                          className="leading-relaxed"
                           dangerouslySetInnerHTML={{ __html: c.text }}
                         />
                       </div>
@@ -140,36 +139,36 @@ const Chatbot = () => {
                       animate={{ opacity: 1 }}
                       className="flex justify-start"
                     >
-                      <div className="bg-white/5 p-3.5 rounded-2xl rounded-bl-lg border border-white/5">
-                        <div className="flex gap-1.5">
-                          <span className="w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce"></span>
-                          <span className="w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce [animation-delay:0.15s]"></span>
-                          <span className="w-1.5 h-1.5 bg-white/30 rounded-full animate-bounce [animation-delay:0.3s]"></span>
+                      <div className="bg-white/5 px-8 py-5 rounded-[2rem] rounded-bl-none border border-white/5">
+                        <div className="flex gap-2">
+                          <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce"></span>
+                          <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:0.15s]"></span>
+                          <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:0.3s]"></span>
                         </div>
                       </div>
                     </motion.div>
                   )}
                   <div ref={chatEndRef} />
                 </div>
-
+ 
                 {/* Input Area */}
                 <form
                   onSubmit={sendMessage}
-                  className="p-3 bg-[#0a0f1a] border-t border-white/5 flex gap-2"
+                  className="p-5 bg-[#0a0f1a] border-t border-white/5 flex gap-4"
                 >
                   <input
                     type="text"
                     value={msg}
                     onChange={(e) => setMsg(e.target.value)}
-                    placeholder="Ask about cars, prices..."
-                    className="flex-1 bg-white/5 border border-white/5 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/15 outline-none focus:border-primary/40 transition-all font-medium"
+                    placeholder="Establish communication..."
+                    className="flex-1 bg-white/5 border border-white/10 rounded-[1.5rem] px-10 py-5 text-sm text-white placeholder:text-white/30 outline-none focus:border-primary/60 transition-all font-bold tracking-tight"
                   />
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-11 h-11 bg-primary rounded-xl flex items-center justify-center hover:bg-secondary transition-all shadow-[0_0_15px_-3px_rgba(245,158,11,0.4)] disabled:opacity-50"
+                    className="w-16 h-16 bg-primary rounded-[1.5rem] flex items-center justify-center hover:bg-secondary transition-all shadow-[0_10px_25px_-5px_rgba(245,158,11,0.6)] disabled:opacity-50 group"
                   >
-                    <Send className="text-white w-4 h-4" />
+                    <Send className="text-white w-6 h-6 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </button>
                 </form>
               </>

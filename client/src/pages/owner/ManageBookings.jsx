@@ -67,14 +67,14 @@ const ManageBookings = () => {
                     <p className='text-muted-foreground'>Rental requests for your cars will appear here.</p>
                 </div>
             ) : (
-                <div className='mt-8 space-y-4 shadow-sm'>
+                <div className='mt-8 space-y-6 shadow-sm pr-4 md:pr-10'>
                     {bookings.map((booking, index) => (
                         <motion.div 
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             key={booking._id} 
-                            className='glass p-8 rounded-[2rem] flex flex-col gap-6 border-white/5 relative overflow-hidden group'
+                            className='glass p-10 rounded-[2.5rem] flex flex-col gap-8 border-white/5 relative group hover:border-white/10 transition-all'
                         >
                             {/* Conflict Indicator */}
                             {bookings.some(b => b.status === 'Confirmed' && b.car?._id === booking.car?._id && b._id !== booking._id && 
@@ -140,7 +140,7 @@ const ManageBookings = () => {
                             )}
 
                             {booking.status === 'Pending' && (
-                                <div className='flex flex-wrap gap-3 pt-6 border-t border-white/5'>
+                                <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-6 border-t border-white/5'>
                                     <button 
                                         onClick={async () => {
                                             try {
@@ -154,23 +154,25 @@ const ManageBookings = () => {
                                                 setSelectedUser(booking.user);
                                             }
                                         }}
-                                        className='px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border border-white/10 flex items-center gap-2'
+                                        className='px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border border-white/10 flex items-center gap-2 whitespace-nowrap'
                                     >
                                         <ShieldCheck className='w-3 h-3' /> Analyze Credentials
                                     </button>
-                                    <div className='flex-1' />
-                                    <button 
-                                        onClick={() => updateStatus(booking._id, 'Confirmed')}
-                                        className='px-8 py-3 bg-primary text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 border border-white/10'
-                                    >
-                                        Approve Request
-                                    </button>
-                                    <button 
-                                        onClick={() => updateStatus(booking._id, 'Cancelled')}
-                                        className='px-8 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border border-red-500/20'
-                                    >
-                                        Decline
-                                    </button>
+                                    
+                                    <div className='flex items-center gap-3 w-full sm:w-auto'>
+                                        <button 
+                                            onClick={() => updateStatus(booking._id, 'Confirmed')}
+                                            className='flex-1 sm:flex-none px-8 py-3 bg-primary text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 border border-white/10 whitespace-nowrap'
+                                        >
+                                            Approve Request
+                                        </button>
+                                        <button 
+                                            onClick={() => updateStatus(booking._id, 'Cancelled')}
+                                            className='flex-1 sm:flex-none px-8 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border border-red-500/20 whitespace-nowrap'
+                                        >
+                                            Decline
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </motion.div>

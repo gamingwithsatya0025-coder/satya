@@ -17,6 +17,7 @@ const Navbar = ({ setShowLogin }) => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const { userData, logout } = useAppContext();
 
   useEffect(() => {
@@ -56,23 +57,77 @@ const Navbar = ({ setShowLogin }) => {
       <div className="hidden md:flex items-center gap-5">
         {userData ? (
           <div className="flex items-center gap-4">
-            <Link to="/owner" className="btn-primary !px-5 !py-2.5 !text-[9px] !rounded-xl">
-                Owner Mode
-            </Link>
-            <Link to="/user" className="flex items-center gap-3 group">
-                <span className='text-[9px] font-black uppercase tracking-widest text-white/40 group-hover:text-primary transition-colors hidden md:block'>Account</span>
-                <div className="w-10 h-10 rounded-xl glass border border-white/10 flex items-center justify-center overflow-hidden group-hover:border-primary/30 transition-all">
-                    <img 
-                      src={userData?.profilePicture && userData.profilePicture !== "null" && userData.profilePicture !== "" ? userData.profilePicture : assets.user_profile} 
-                      onError={(e) => { e.target.onerror = null; e.target.src = assets.user_profile; }}
-                      alt="Profile" 
-                      className="w-full h-full object-cover" 
-                    />
+            <div className="relative flex items-center">
+                <div 
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  className={`w-12 h-12 rounded-xl glass border flex items-center justify-center overflow-hidden transition-all cursor-pointer p-0.5 ${showProfileDropdown ? 'border-primary shadow-[0_0_20px_rgba(99,102,241,0.3)]' : 'border-white/10 hover:border-white/20'}`}
+                >
+                    <div className="w-full h-full rounded-lg overflow-hidden">
+                        <img 
+                          src={userData?.profilePicture && userData.profilePicture !== "null" && userData.profilePicture !== "" ? userData.profilePicture : assets.user_profile} 
+                          onError={(e) => { e.target.onerror = null; e.target.src = assets.user_profile; }}
+                          alt="Profile" 
+                          className="w-full h-full object-cover" 
+                        />
+                    </div>
                 </div>
-            </Link>
-            <button onClick={logout} className="text-[9px] font-black uppercase tracking-widest text-white/25 hover:text-red-400 transition-colors">
-                Logout
-            </button>
+                
+                {/* Desktop Dropdown - Professional Minimalist */}
+                <AnimatePresence>
+                  {showProfileDropdown && (
+                    <>
+                      {/* Invisible Backdrop to close on click outside */}
+                      <div className="fixed inset-0 z-[-1]" onClick={() => setShowProfileDropdown(false)} />
+                      
+                      <motion.div 
+                          initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                          className="absolute right-0 top-full mt-3 w-[240px] bg-[#0A0A0A]/95 backdrop-blur-3xl border border-white/10 rounded-[1.5rem] p-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[100]"
+                      >
+                          <div className="px-5 py-4 border-b border-white/5 mb-1">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-0.5">Verified Account</p>
+                              <p className="text-sm font-bold text-white truncate">{userData.name || "Guest User"}</p>
+                          </div>
+
+                          <div className="p-1 space-y-1">
+                              <Link 
+                                to="/owner" 
+                                onClick={() => setShowProfileDropdown(false)}
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all group/item"
+                              >
+                                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover/item:bg-primary/10 transition-colors">
+                                      <img src={assets.carIcon} className="w-4 h-4 opacity-40 group-hover/item:opacity-100 brightness-0 invert transition-all" alt="" />
+                                  </div>
+                                  <span className="text-[11px] font-bold uppercase tracking-widest text-white/50 group-hover/item:text-white">Owner Portal</span>
+                              </Link>
+                              
+                              <Link 
+                                to="/user" 
+                                onClick={() => setShowProfileDropdown(false)}
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all group/item"
+                              >
+                                  <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover/item:bg-blue-500/10 transition-colors">
+                                      <img src={assets.listIcon} className="w-4 h-4 opacity-40 group-hover/item:opacity-100 brightness-0 invert transition-all" alt="" />
+                                  </div>
+                                  <span className="text-[11px] font-bold uppercase tracking-widest text-white/50 group-hover/item:text-white">Renter Portal</span>
+                              </Link>
+                          </div>
+                          
+                          <div className="h-px bg-white/5 my-1 mx-2" />
+                          
+                          <button 
+                            onClick={() => { logout(); setShowProfileDropdown(false); }} 
+                            className="w-full flex items-center gap-3 px-5 py-4 rounded-xl hover:bg-red-500/5 transition-all group/item"
+                          >
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-500/40 group-hover:bg-red-500 transition-colors" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-red-500/50 group-hover/item:text-red-500">Sign Out</span>
+                          </button>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+            </div>
           </div>
         ) : (
           <motion.button 

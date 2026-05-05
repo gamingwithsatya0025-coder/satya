@@ -27,6 +27,11 @@ const CarDetails = () => {
   const [panFile, setPanFile] = useState(null);
   const [dlFile, setDlFile] = useState(null);
 
+  // New Contact States
+  const [fullName, setFullName] = useState(userData?.name || '');
+  const [email, setEmail] = useState(userData?.email || '');
+  const [phone, setPhone] = useState(userData?.phone || '');
+
   const fetchCarDetails = useCallback(async () => {
     try {
       const response = await axios.get(`${backendUrl}/api/car/single/${id}`);
@@ -109,6 +114,9 @@ const CarDetails = () => {
 
           const verifyRes = await axios.post(`${backendUrl}/api/user/verify-request`, {
               userId: userData.id,
+              fullName,
+              email,
+              phone,
               aadhaarNumber,
               aadhaarImage: aadhaarImageUrl,
               panNumber,
@@ -121,6 +129,9 @@ const CarDetails = () => {
                // Update local state with all identity details
                const updatedUser = { 
                    ...userData, 
+                   name: fullName,
+                   email: email,
+                   phone: phone,
                    verificationStatus: 'pending',
                    aadhaarNumber,
                    aadhaarImage: aadhaarImageUrl,
@@ -190,11 +201,11 @@ const CarDetails = () => {
   );
 
   return (
-    <div className='px-6 md:px-16 lg:px-24 xl:px-32 pb-20 bg-background min-h-screen relative z-10 pt-32 md:pt-40'>
+    <div className='px-6 md:px-16 lg:px-24 xl:px-32 pb-20 bg-background min-h-screen relative z-10 pt-10 md:pt-12'>
       <motion.button 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className='flex items-center justify-center gap-3 mb-12 h-12 px-6 glass border border-white/10 rounded-2xl w-fit group hover:bg-white/10 transition-all cursor-pointer shadow-[0_0_30px_-5px_rgba(245,158,11,0.2)]' 
+        className='flex items-center justify-center gap-3 mb-6 h-12 px-6 glass border border-white/10 rounded-2xl w-fit group hover:bg-white/10 transition-all cursor-pointer shadow-[0_0_30px_-5px_rgba(245,158,11,0.2)]' 
         onClick={() => navigate('/cars')}
       >
         <ArrowLeft className='w-4 h-4 text-white/50 group-hover:text-white group-hover:-translate-x-1 transition-all' />
@@ -296,7 +307,7 @@ const CarDetails = () => {
             animate={{ opacity: 1, x: 0 }}
             className='lg:col-span-1'
         >
-            <form onSubmit={handleSubmit} className='glass p-8 rounded-[2.5rem] sticky top-32 premium-shadow border-white/10 space-y-8'>
+            <form onSubmit={handleSubmit} className='glass p-8 rounded-[2.5rem] sticky top-24 premium-shadow border-white/10 space-y-8'>
                 <div className='flex items-end justify-between border-b border-white/10 pb-6'>
                     <div>
                         <p className='text-xs font-bold uppercase tracking-widest text-white/40 mb-1'>Daily Rate</p>
@@ -343,14 +354,14 @@ const CarDetails = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className='fixed inset-0 z-[2000] flex items-center justify-center bg-[#020617]/90 backdrop-blur-xl p-4'
+            className='fixed inset-0 z-[2000] flex items-start justify-center bg-[#020617]/95 backdrop-blur-2xl p-4 overflow-y-auto pt-10 md:pt-20 custom-scrollbar'
           >
             <motion.div 
               initial={{ scale: 0.95, y: 30 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 30 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className='glass w-full max-w-4xl rounded-[3rem] border border-white/10 p-10 md:p-14 shadow-[0_40px_100px_-20px_rgba(0,0,0,1)] relative max-h-[90vh] overflow-y-auto custom-scrollbar'
+              className='glass w-full max-w-4xl rounded-[3rem] border border-white/10 p-10 md:p-14 shadow-[0_40px_100px_-20px_rgba(0,0,0,1)] relative mb-20'
             >
               {/* Decorative Glows */}
               <div className='absolute -top-40 -right-40 w-96 h-96 bg-primary/20 blur-[120px] pointer-events-none rounded-full' />
@@ -375,6 +386,22 @@ const CarDetails = () => {
               </div>
 
               <form onSubmit={handleVerifyAndBook} className='space-y-10 relative z-10'>
+                {/* Personal Credentials Section */}
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6 glass p-8 rounded-[2rem] border-white/5 bg-white/[0.01]'>
+                    <div className='space-y-2'>
+                        <label className='text-[9px] font-black uppercase tracking-widest text-white/30 ml-1'>Full Legal Name</label>
+                        <input type='text' required value={fullName} onChange={(e) => setFullName(e.target.value)} className='w-full h-12 bg-black/40 border border-white/5 px-4 rounded-xl text-xs font-bold text-white outline-none focus:border-primary transition-all' placeholder='Name' />
+                    </div>
+                    <div className='space-y-2'>
+                        <label className='text-[9px] font-black uppercase tracking-widest text-white/30 ml-1'>Email Address</label>
+                        <input type='email' required value={email} onChange={(e) => setEmail(e.target.value)} className='w-full h-12 bg-black/40 border border-white/5 px-4 rounded-xl text-xs font-bold text-white outline-none focus:border-primary transition-all' placeholder='Email' />
+                    </div>
+                    <div className='space-y-2'>
+                        <label className='text-[9px] font-black uppercase tracking-widest text-white/30 ml-1'>Phone Number</label>
+                        <input type='tel' required value={phone} onChange={(e) => setPhone(e.target.value)} className='w-full h-12 bg-black/40 border border-white/5 px-4 rounded-xl text-xs font-bold text-white outline-none focus:border-primary transition-all' placeholder='+91 00000 00000' />
+                    </div>
+                </div>
+
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-10'>
                     {/* Aadhaar Section */}
                     <div className='space-y-4 glass p-6 rounded-3xl border-white/5'>

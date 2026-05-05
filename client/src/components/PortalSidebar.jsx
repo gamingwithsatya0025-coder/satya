@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext'
 import axios from 'axios'
 import { motion } from 'framer-motion'
@@ -33,8 +33,19 @@ const PortalSidebar = ({ menuLinks, roleTitle, switchRolePath, switchRoleLabel }
 
   return ( 
     <div className='hidden md:flex flex-col w-72 min-h-screen glass border-r border-white/10 shrink-0 sticky top-0'>
-      <div className='flex flex-col items-center pt-12 pb-8 border-b border-white/5 bg-white/[0.02]'>
-        <div className='group relative mb-4'>
+      <div className='flex flex-col items-center pt-8 pb-8 border-b border-white/5 bg-white/[0.02] relative'>
+        {/* Back Button */}
+        <Link to='/' className='absolute top-6 left-6 p-2 rounded-lg bg-white/5 hover:bg-primary/20 border border-white/10 transition-all group/back'>
+            <motion.img 
+                whileHover={{ x: -4 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                src={assets.arrow_icon} 
+                className='w-3 h-3 opacity-40 group-hover/back:opacity-100 rotate-180 transition-all brightness-0 invert' 
+                alt="Back" 
+            />
+        </Link>
+
+        <div className='group relative mb-4 mt-4'>
           <label htmlFor="sidebar-image">
             <img 
                 src={image ? URL.createObjectURL(image) : user?.profilePicture || assets.user_profile} 

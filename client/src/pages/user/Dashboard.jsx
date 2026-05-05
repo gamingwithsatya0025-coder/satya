@@ -34,7 +34,6 @@ const Dashboard = () => {
         { label: "Total Bookings", value: bookings.length, icon: Zap, color: "text-primary", bg: "bg-primary/10" },
         { label: "Total Spent", value: `₹${bookings.reduce((acc, b) => acc + (b.totalPrice || 0), 0).toLocaleString()}`, icon: CreditCard, color: "text-emerald-500", bg: "bg-emerald-500/10" },
         { label: "Active Trips", value: bookings.filter(b => b.status === 'Confirmed').length, icon: Clock, color: "text-amber-500", bg: "bg-amber-500/10" },
-        { label: "Trust Rating", value: userData?.verificationStatus === 'approved' ? "5.0" : "4.2", icon: Star, color: "text-indigo-500", bg: "bg-indigo-500/10" },
     ];
 
     if (loading) return (
@@ -49,7 +48,7 @@ const Dashboard = () => {
                 <PortalTitle title={`Welcome Back, ${userData?.name}`} subTitle="Your real-time luxury rental analytics and account performance." />
 
                 {/* Stats Grid */}
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12'>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-12'>
                     {stats.map((stat, index) => (
                         <motion.div 
                             key={index}
@@ -92,7 +91,7 @@ const Dashboard = () => {
                                 }
                             </p>
                             <button 
-                                onClick={() => navigate('/user/my-bookings')}
+                                onClick={() => navigate(userData?.verificationStatus === 'approved' ? '/user/my-bookings' : '/user/verify')}
                                 className='px-8 py-4 bg-white text-black text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-primary hover:text-white transition-all flex items-center gap-3 group'
                             >
                                 {userData?.verificationStatus === 'approved' ? 'View Active Rentals' : 'Complete Verification'}
