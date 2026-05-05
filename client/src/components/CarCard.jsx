@@ -27,7 +27,14 @@ const CarCard = ({ car }) => {
                 scale: 1.02,
                 boxShadow: "0 40px 80px -15px rgba(0, 0, 0, 0.5), 0 0 30px rgba(99, 102, 241, 0.15)"
             }}
-            onClick={() => { navigate(`/car-details/${car._id}`); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+            onClick={() => { 
+                if (car._id) {
+                    navigate(`/car-details/${car._id}`); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                } else {
+                    console.error("Car ID missing", car);
+                }
+            }} 
             className='group bg-[#0a0f1a] rounded-[2.5rem] overflow-hidden cursor-pointer shadow-2xl transition-all duration-700 border border-white/5 hover:border-primary/30 relative card-animation gsap-reveal'
             data-aos="zoom-in"
         >

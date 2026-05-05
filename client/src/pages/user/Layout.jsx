@@ -2,7 +2,7 @@ import React from 'react'
 import PortalNavbar from '../../components/PortalNavbar'
 import PortalSidebar from '../../components/PortalSidebar'
 import { Outlet } from 'react-router-dom'
-import { ownerMenuLinks } from '../../assets/assets'
+import { userMenuLinks } from '../../assets/assets'
 
 const Layout = () => {
   return (
@@ -10,10 +10,10 @@ const Layout = () => {
       <PortalNavbar />
       <div className='flex flex-1'>
         <PortalSidebar 
-            menuLinks={ownerMenuLinks} 
-            roleTitle="Fleet Manager" 
-            switchRolePath="/user" 
-            switchRoleLabel="Switch to Renting" 
+            menuLinks={userMenuLinks} 
+            roleTitle="Verified Renter" 
+            switchRolePath="/owner" 
+            switchRoleLabel="Switch to Hosting" 
         />
         <main className='flex-1 relative'>
             <Outlet />

@@ -3,26 +3,26 @@ import { useAppContext } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import Title from '../../components/owner/Title';
+import PortalTitle from '../../components/PortalTitle';
 import { ShieldCheck, CreditCard, FileText, Upload, Loader2, CheckCircle, Fingerprint, Lock, ShieldAlert, Sparkles, X } from 'lucide-react';
 import { assets } from '../../assets/assets';
 
-const VerifyIdentity = () => {
+const Verify = () => {
     const { userData, backendUrl, token, setUserData } = useAppContext();
     const navigate = useNavigate();
     
     const [verifying, setVerifying] = useState(false);
-    const [aadhaarNumber, setAadhaarNumber] = useState('');
-    const [panNumber, setPanNumber] = useState('');
-    const [drivingLicenceNumber, setDrivingLicenceNumber] = useState('');
+    const [aadhaarNumber, setAadhaarNumber] = useState(userData.aadhaarNumber || '');
+    const [panNumber, setPanNumber] = useState(userData.panNumber || '');
+    const [drivingLicenceNumber, setDrivingLicenceNumber] = useState(userData.drivingLicenceNumber || '');
 
     const [aadhaarFile, setAadhaarFile] = useState(null);
     const [panFile, setPanFile] = useState(null);
     const [dlFile, setDlFile] = useState(null);
 
-    const [aadhaarPreview, setAadhaarPreview] = useState(null);
-    const [panPreview, setPanPreview] = useState(null);
-    const [dlPreview, setDlPreview] = useState(null);
+    const [aadhaarPreview, setAadhaarPreview] = useState(userData.aadhaarImage || null);
+    const [panPreview, setPanPreview] = useState(userData.panImage || null);
+    const [dlPreview, setDlPreview] = useState(userData.drivingLicenceImage || null);
 
     const handleFileChange = (e, setter, previewSetter) => {
         const file = e.target.files[0];
@@ -51,10 +51,10 @@ const VerifyIdentity = () => {
         e.preventDefault();
         setVerifying(true);
         try {
-            // Upload images first
-            const aadhaarImageUrl = await uploadFile(aadhaarFile);
-            const panImageUrl = await uploadFile(panFile);
-            const dlImageUrl = await uploadFile(dlFile);
+            // Upload images only if new files were selected
+            const aadhaarImageUrl = aadhaarFile ? await uploadFile(aadhaarFile) : aadhaarPreview;
+            const panImageUrl = panFile ? await uploadFile(panFile) : panPreview;
+            const dlImageUrl = dlFile ? await uploadFile(dlFile) : dlPreview;
 
             if (!aadhaarImageUrl || !panImageUrl || !dlImageUrl) {
                 alert("Please upload all required documents.");
@@ -73,11 +73,20 @@ const VerifyIdentity = () => {
             }, { headers: { token } });
 
             if (response.data.success) {
-                const updatedUser = { ...userData, verificationStatus: 'pending' };
+                const updatedUser = { 
+                    ...userData, 
+                    verificationStatus: 'pending',
+                    aadhaarNumber,
+                    aadhaarImage: aadhaarImageUrl,
+                    panNumber,
+                    panImage: panImageUrl,
+                    drivingLicenceNumber,
+                    drivingLicenceImage: dlImageUrl
+                };
                 setUserData(updatedUser);
                 localStorage.setItem('user', JSON.stringify(updatedUser));
                 alert("Identity Submitted Successfully! Awaiting approval.");
-                navigate('/owner');
+                navigate('/user/my-bookings');
             } else {
                 alert(response.data.message);
             }
@@ -99,7 +108,7 @@ const VerifyIdentity = () => {
             className='px-4 py-12 md:px-10 lg:px-16 flex-1 w-full max-w-7xl mx-auto overflow-y-auto custom-scrollbar h-screen bg-[#030303] pb-32'
         >
             <div className='flex flex-col md:flex-row items-center justify-between mb-16 gap-8'>
-                <Title title="Identity Hub" subTitle="Securely authorize your identity to start listing vehicles." />
+                <PortalTitle title="Identity Hub" subTitle="Securely authorize your identity to access full platform features." />
                 
                 <div className='flex items-center gap-4 glass px-6 py-4 rounded-3xl border-emerald-500/20'>
                     <div className='w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center'>
@@ -322,4 +331,4 @@ const VerifyIdentity = () => {
     );
 };
 
-export default VerifyIdentity;
+export default Verify;

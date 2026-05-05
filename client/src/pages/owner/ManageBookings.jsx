@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useAppContext } from '../../context/AppContext';
-import Title from '../../components/owner/Title';
+import PortalTitle from '../../components/PortalTitle';
 import axios from 'axios';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { assets } from '../../assets/assets';
+import { ShieldCheck, AlertTriangle, MessageSquare, Info, X, Fingerprint, FileText } from 'lucide-react';
 
 const ManageBookings = () => {
     const { userData, backendUrl, token } = useAppContext();
@@ -20,9 +22,11 @@ const ManageBookings = () => {
             });
             if (response.data.success) {
                 // Filter bookings for cars owned by this user
-                const ownerBookings = response.data.bookings.filter(b => 
-                    b.car?.owner === userData.id || b.car?.owner?._id === userData.id
-                );
+                const ownerBookings = response.data.bookings.filter(b => {
+                    const ownerId = b.owner?._id || b.owner || b.car?.owner?._id || b.car?.owner;
+                    const myId = userData.id || userData._id;
+                    return ownerId === myId;
+                });
                 setBookings(ownerBookings.reverse());
             }
         } catch (error) {
@@ -51,7 +55,7 @@ const ManageBookings = () => {
 
     return (
         <div className='px-4 pt-10 md:px-10 flex-1 h-screen overflow-y-auto custom-scrollbar pb-20'>
-            <Title title="Customer Bookings" subTitle="Manage reservations and rental requests for your vehicles." />
+            <PortalTitle title="Customer Bookings" subTitle="Manage reservations and rental requests for your vehicles." />
 
             {loading ? (
                 <div className='py-20 flex justify-center'>
@@ -70,62 +74,102 @@ const ManageBookings = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             key={booking._id} 
-                            className='glass p-6 rounded-3xl grid grid-cols-1 lg:grid-cols-4 items-center gap-6 border-white/5'
+                            className='glass p-8 rounded-[2rem] flex flex-col gap-6 border-white/5 relative overflow-hidden group'
                         >
-                            <div className='flex items-center gap-4'>
-                                <div className='w-14 h-14 rounded-xl overflow-hidden bg-primary/10 flex items-center justify-center shrink-0'>
-                                     <img src={assets.user_profile} alt="" className='w-full h-full object-cover opacity-50' />
+                            {/* Conflict Indicator */}
+                            {bookings.some(b => b.status === 'Confirmed' && b.car?._id === booking.car?._id && b._id !== booking._id && 
+                                ((new Date(booking.pickupDate) >= new Date(b.pickupDate) && new Date(booking.pickupDate) <= new Date(b.returnDate)) ||
+                                (new Date(booking.returnDate) >= new Date(b.pickupDate) && new Date(booking.returnDate) <= new Date(b.returnDate)))) && (
+                                <div className='absolute top-0 right-0 bg-red-500/20 text-red-500 px-4 py-1.5 text-[8px] font-black uppercase tracking-widest rounded-bl-2xl border-l border-b border-red-500/20 flex items-center gap-2'>
+                                    <AlertTriangle className='w-3 h-3' /> Schedule Conflict
                                 </div>
-                                <div>
-                                    <p className='font-bold text-sm'>{booking.user?.name}</p>
-                                    <p className='text-[10px] text-muted-foreground uppercase tracking-widest'>{booking.user?.email}</p>
+                            )}
+
+                            <div className='flex flex-col lg:flex-row lg:items-center justify-between gap-6'>
+                                <div className='flex items-center gap-4'>
+                                    <div className='w-16 h-16 rounded-2xl overflow-hidden border border-white/10 bg-primary/5 flex items-center justify-center shrink-0'>
+                                        <img src={booking.user?.profilePicture || assets.user_profile} alt="" className='w-full h-full object-cover' />
+                                    </div>
+                                    <div>
+                                        <p className='font-black text-white tracking-tight'>{booking.user?.name}</p>
+                                        <div className='flex items-center gap-2'>
+                                            <div className='w-2 h-2 rounded-full bg-green-500' />
+                                            <p className='text-[10px] text-white/30 uppercase tracking-widest font-bold'>{booking.user?.email}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className='flex flex-wrap gap-10'>
+                                    <div className='space-y-1'>
+                                        <p className='text-[8px] font-black uppercase tracking-[0.2em] text-primary'>Vehicle</p>
+                                        <h4 className='font-black text-white text-sm'>{booking.car?.brand} {booking.car?.model}</h4>
+                                        <p className='text-[8px] text-white/30 uppercase tracking-widest'>{booking.car?.location}</p>
+                                    </div>
+
+                                    <div className='space-y-1'>
+                                        <p className='text-[8px] font-black uppercase tracking-[0.2em] text-primary'>Duration</p>
+                                        <p className='text-xs font-black text-white/80'>
+                                            {new Date(booking.pickupDate).toLocaleDateString()} — {new Date(booking.returnDate).toLocaleDateString()}
+                                        </p>
+                                    </div>
+
+                                    <div className='space-y-1'>
+                                        <p className='text-[8px] font-black uppercase tracking-[0.2em] text-primary'>Total Earnings</p>
+                                        <p className='text-xl font-black text-white'>{currency}{booking.totalPrice}</p>
+                                    </div>
+
+                                    <div className='flex items-center'>
+                                        <div className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] ${
+                                            booking.status === 'Confirmed' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 
+                                            booking.status === 'Pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                                        }`}>
+                                            {booking.status}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div>
-                                <h4 className='font-bold text-sm'>{booking.car?.brand} {booking.car?.model}</h4>
-                                <p className='text-[10px] text-muted-foreground uppercase'>{booking.car?.location}</p>
-                            </div>
-
-                            <div className='space-y-1'>
-                                <p className='text-[10px] font-bold uppercase tracking-widest text-primary'>Rental Dates</p>
-                                <p className='text-xs font-medium'>
-                                    {new Date(booking.pickupDate).toLocaleDateString()} — {new Date(booking.returnDate).toLocaleDateString()}
-                                </p>
-                            </div>
-
-                            <div className='flex items-center justify-between lg:justify-end gap-6'>
-                                <div className='text-right'>
-                                    <p className='text-[10px] font-bold text-white/30 uppercase'>Earnings</p>
-                                    <p className='text-lg font-black'>{currency}{booking.totalPrice}</p>
+                            {booking.status === 'Confirmed' && (
+                                <div className='flex items-center gap-4 pt-6 border-t border-white/5'>
+                                    <Link to={`/chat/${booking._id}`} className='flex-1'>
+                                        <button className='w-full py-4 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border border-primary/20 flex items-center justify-center gap-3'>
+                                            <MessageSquare className='w-4 h-4' /> Start Conversation with Renter
+                                        </button>
+                                    </Link>
                                 </div>
-                                <div className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-widest ${
-                                    booking.status === 'Confirmed' ? 'bg-green-500/20 text-green-400' : 
-                                    booking.status === 'Pending' ? 'bg-amber-500/20 text-amber-400' : 'bg-red-500/20 text-red-400'
-                                }`}>
-                                    {booking.status}
-                                </div>
-                            </div>
+                            )}
 
                             {booking.status === 'Pending' && (
-                                <div className='lg:col-span-4 flex flex-wrap gap-3 pt-4 border-t border-white/5 mt-2'>
+                                <div className='flex flex-wrap gap-3 pt-6 border-t border-white/5'>
                                     <button 
-                                        onClick={() => setSelectedUser(booking.user)}
-                                        className='px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10'
+                                        onClick={async () => {
+                                            try {
+                                                const res = await axios.post(`${backendUrl}/api/user/get-profile`, { userId: booking.user._id || booking.user.id }, { headers: { token } });
+                                                if (res.data.success) {
+                                                    setSelectedUser(res.data.user);
+                                                } else {
+                                                    setSelectedUser(booking.user);
+                                                }
+                                            } catch (err) {
+                                                setSelectedUser(booking.user);
+                                            }
+                                        }}
+                                        className='px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border border-white/10 flex items-center gap-2'
                                     >
-                                        View Credentials
+                                        <ShieldCheck className='w-3 h-3' /> Analyze Credentials
                                     </button>
+                                    <div className='flex-1' />
                                     <button 
                                         onClick={() => updateStatus(booking._id, 'Confirmed')}
-                                        className='px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-green-500/20'
+                                        className='px-8 py-3 bg-primary text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20 border border-white/10'
                                     >
-                                        Approve
+                                        Approve Request
                                     </button>
                                     <button 
                                         onClick={() => updateStatus(booking._id, 'Cancelled')}
-                                        className='px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border border-red-500/20'
+                                        className='px-8 py-3 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all border border-red-500/20'
                                     >
-                                        Reject
+                                        Decline
                                     </button>
                                 </div>
                             )}
@@ -135,58 +179,98 @@ const ManageBookings = () => {
             )}
 
             {/* Credentials Modal */}
-            {selectedUser && (
-                <div className='fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4' onClick={() => setSelectedUser(null)}>
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className='glass w-full max-w-2xl rounded-[2.5rem] p-8 border border-white/10 relative'
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button onClick={() => setSelectedUser(null)} className='absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors'>
-                            <img src={assets.close_icon} alt="" className='w-3 h-3 invert opacity-50' />
-                        </button>
+            <AnimatePresence>
+                {selectedUser && (
+                    <div className='fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-4 md:p-10' onClick={() => setSelectedUser(null)}>
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className='glass w-full max-w-5xl rounded-[3rem] p-10 md:p-16 border border-white/10 relative overflow-y-auto max-h-[90vh] custom-scrollbar shadow-[0_50px_100px_-20px_rgba(0,0,0,1)]'
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button onClick={() => setSelectedUser(null)} className='absolute top-10 right-10 w-14 h-14 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/10 group'>
+                                <X className='w-6 h-6 text-white/40 group-hover:text-white group-hover:rotate-90 transition-all' />
+                            </button>
 
-                        <h3 className='text-2xl font-black mb-6 uppercase tracking-tighter'>Customer Credentials</h3>
-                        
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
-                            <div className='space-y-4'>
-                                <div>
-                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Customer Name</p>
-                                    <p className='font-bold'>{selectedUser.name}</p>
+                            <div className='flex flex-col md:flex-row items-start md:items-center gap-8 mb-16'>
+                                <div className='w-24 h-24 rounded-[2rem] bg-primary/10 flex items-center justify-center border border-primary/20 shadow-[0_0_50px_-10px_rgba(99,102,241,0.5)]'>
+                                    <Fingerprint className='w-12 h-12 text-primary' />
                                 </div>
                                 <div>
-                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Verification Status</p>
-                                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${
-                                        selectedUser.verificationStatus === 'approved' ? 'bg-green-500/20 text-green-400' : 'bg-amber-500/20 text-amber-400'
-                                    }`}>
-                                        {selectedUser.verificationStatus}
-                                    </span>
+                                    <h2 className='text-4xl lg:text-5xl font-black font-heading uppercase tracking-tighter text-white leading-none'>{selectedUser.name}</h2>
+                                    <p className='text-primary text-[10px] font-black uppercase tracking-[0.5em] mt-4'>Official Identity Protocol</p>
                                 </div>
                             </div>
 
-                            <div className='space-y-4'>
-                                <div>
-                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Aadhaar Number</p>
-                                    <p className='font-mono text-sm tracking-widest'>{selectedUser.aadhaarNumber || 'N/A'}</p>
+                            <div className='grid grid-cols-1 md:grid-cols-3 gap-12'>
+                                {/* Aadhaar */}
+                                <div className='space-y-6'>
+                                    <div className='flex items-center gap-3'>
+                                        <div className='w-2 h-2 rounded-full bg-primary animate-pulse' />
+                                        <span className='text-[10px] font-black uppercase tracking-widest text-white/40'>Aadhaar Identification</span>
+                                    </div>
+                                    <p className='text-xl font-black text-white tracking-[0.3em] uppercase'>{selectedUser.aadhaarNumber || 'NOT PROVIDED'}</p>
+                                    <div className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative'>
+                                        {selectedUser.aadhaarImage ? (
+                                            <img src={selectedUser.aadhaarImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="Aadhaar" />
+                                        ) : (
+                                            <div className='absolute inset-0 flex flex-col items-center justify-center gap-3'>
+                                                <AlertTriangle className='w-6 h-6 text-white/10' />
+                                                <span className='text-[8px] font-black uppercase tracking-widest text-white/10'>Document Missing</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>Driving Licence</p>
-                                    <p className='font-mono text-sm tracking-widest uppercase'>{selectedUser.drivingLicenceNumber || 'N/A'}</p>
+
+                                {/* PAN */}
+                                <div className='space-y-6'>
+                                    <div className='flex items-center gap-3'>
+                                        <div className='w-2 h-2 rounded-full bg-amber-500 animate-pulse' />
+                                        <span className='text-[10px] font-black uppercase tracking-widest text-white/40'>PAN Verification</span>
+                                    </div>
+                                    <p className='text-xl font-black text-white tracking-[0.3em] uppercase'>{selectedUser.panNumber || 'NOT PROVIDED'}</p>
+                                    <div className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative'>
+                                        {selectedUser.panImage ? (
+                                            <img src={selectedUser.panImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="PAN" />
+                                        ) : (
+                                            <div className='absolute inset-0 flex flex-col items-center justify-center gap-3'>
+                                                <AlertTriangle className='w-6 h-6 text-white/10' />
+                                                <span className='text-[8px] font-black uppercase tracking-widest text-white/10'>Document Missing</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className='text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1'>PAN Number</p>
-                                    <p className='font-mono text-sm tracking-widest uppercase'>{selectedUser.panNumber || 'N/A'}</p>
+
+                                {/* DL */}
+                                <div className='space-y-6'>
+                                    <div className='flex items-center gap-3'>
+                                        <div className='w-2 h-2 rounded-full bg-indigo-500 animate-pulse' />
+                                        <span className='text-[10px] font-black uppercase tracking-widest text-white/40'>Driving Authorization</span>
+                                    </div>
+                                    <p className='text-xl font-black text-white tracking-[0.3em] uppercase'>{selectedUser.drivingLicenceNumber || 'NOT PROVIDED'}</p>
+                                    <div className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative'>
+                                        {selectedUser.drivingLicenceImage ? (
+                                            <img src={selectedUser.drivingLicenceImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="License" />
+                                        ) : (
+                                            <div className='absolute inset-0 flex flex-col items-center justify-center gap-3'>
+                                                <AlertTriangle className='w-6 h-6 text-white/10' />
+                                                <span className='text-[8px] font-black uppercase tracking-widest text-white/10'>Document Missing</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className='mt-8 pt-8 border-t border-white/5 text-[10px] text-white/30 uppercase tracking-[0.2em] leading-relaxed'>
-                            Note: Credentials have been pre-validated via regex patterns. Please verify the document numbers match your records if necessary.
-                        </div>
-                    </motion.div>
-                </div>
-            )}
+                            <div className='mt-20 pt-10 border-t border-white/5 text-center'>
+                                <p className='text-[10px] font-black text-white/20 uppercase tracking-[0.5em]'>
+                                    Please cross-reference all documents before finalizing the rental contract.
+                                </p>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

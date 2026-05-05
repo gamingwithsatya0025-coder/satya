@@ -9,7 +9,6 @@ import NavHeader from "./ui/nav-header";
 const menulinks = [
   { name: "Home", path: "/" },
   { name: "Cars", path: "/cars" },
-  { name: "My Bookings", path: "/my-bookings" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" }
 ];
@@ -58,15 +57,18 @@ const Navbar = ({ setShowLogin }) => {
         {userData ? (
           <div className="flex items-center gap-4">
             <Link to="/owner" className="btn-primary !px-5 !py-2.5 !text-[9px] !rounded-xl">
-                Partner Portal
+                Owner Mode
             </Link>
-            <Link title="My Bookings" to="/my-bookings" className="w-10 h-10 rounded-xl glass border border-white/10 flex items-center justify-center overflow-hidden hover:border-primary/30 transition-all">
-                <img 
-                  src={userData?.profilePicture && userData.profilePicture !== "null" && userData.profilePicture !== "" ? userData.profilePicture : assets.user_profile} 
-                  onError={(e) => { e.target.onerror = null; e.target.src = assets.user_profile; }}
-                  alt="Profile" 
-                  className="w-full h-full object-cover" 
-                />
+            <Link to="/user" className="flex items-center gap-3 group">
+                <span className='text-[9px] font-black uppercase tracking-widest text-white/40 group-hover:text-primary transition-colors hidden md:block'>Account</span>
+                <div className="w-10 h-10 rounded-xl glass border border-white/10 flex items-center justify-center overflow-hidden group-hover:border-primary/30 transition-all">
+                    <img 
+                      src={userData?.profilePicture && userData.profilePicture !== "null" && userData.profilePicture !== "" ? userData.profilePicture : assets.user_profile} 
+                      onError={(e) => { e.target.onerror = null; e.target.src = assets.user_profile; }}
+                      alt="Profile" 
+                      className="w-full h-full object-cover" 
+                    />
+                </div>
             </Link>
             <button onClick={logout} className="text-[9px] font-black uppercase tracking-widest text-white/25 hover:text-red-400 transition-colors">
                 Logout
@@ -131,7 +133,8 @@ const Navbar = ({ setShowLogin }) => {
                   <div className="h-px bg-white/5 my-4" />
                   {userData ? (
                      <div className="flex flex-col gap-6 mt-2">
-                       <Link to="/owner" onClick={() => setOpen(false)} className="btn-primary w-full text-center py-4">Partner Portal</Link>
+                       <Link to="/user" onClick={() => setOpen(false)} className="text-2xl font-black uppercase text-white hover:text-primary transition-colors">User Portal</Link>
+                       <Link to="/owner" onClick={() => setOpen(false)} className="btn-primary w-full text-center py-4">Owner Mode</Link>
                        <button onClick={() => { logout(); setOpen(false); }} className="text-left text-red-500/70 hover:text-red-500 font-black uppercase tracking-widest text-xs transition-colors">Logout</button>
                      </div>
                   ) : (

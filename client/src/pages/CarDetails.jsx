@@ -5,13 +5,14 @@ import Loader from '../components/Loader';
 import { useAppContext } from '../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { SearchX, ArrowLeft, ShieldCheck, CreditCard, FileText, Upload } from 'lucide-react';
+import { SearchX, ArrowLeft, ShieldCheck, CreditCard, FileText, Upload, Loader2, CheckCircle, X } from 'lucide-react';
 
 const CarDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { backendUrl, token, userData, setUserData } = useAppContext();
   const [car, setCar] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [pickupDate, setPickupDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
@@ -117,8 +118,17 @@ const CarDetails = () => {
           }, { headers: { token } });
 
           if (verifyRes.data.success) {
-               // Update local state to 'pending'
-               const updatedUser = { ...userData, verificationStatus: 'pending' };
+               // Update local state with all identity details
+               const updatedUser = { 
+                   ...userData, 
+                   verificationStatus: 'pending',
+                   aadhaarNumber,
+                   aadhaarImage: aadhaarImageUrl,
+                   panNumber,
+                   panImage: panImageUrl,
+                   drivingLicenceNumber,
+                   drivingLicenceImage: dlImageUrl
+               };
                setUserData(updatedUser);
                localStorage.setItem('user', JSON.stringify(updatedUser));
                
@@ -193,18 +203,46 @@ const CarDetails = () => {
       
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-12'>
         <div className='lg:col-span-2 space-y-12'>
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className='relative rounded-[2.5rem] overflow-hidden premium-shadow group'
-          >
-            <img src={car.images?.[0] || car.image} alt="" className='w-full h-auto md:max-h-[500px] object-cover transition-transform duration-700 group-hover:scale-105' />
-            <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
-            <div className='absolute bottom-8 left-8'>
-               <span className='px-4 py-1 bg-primary text-white text-xs font-bold rounded-full uppercase tracking-widest mb-2 inline-block'>Available Now</span>
-               <h1 className='text-4xl md:text-6xl font-black text-white font-heading'>{car.brand} {car.model}</h1>
-            </div>
-          </motion.div>
+          <div className='space-y-6'>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className='relative rounded-[2.5rem] overflow-hidden premium-shadow group aspect-[16/9]'
+            >
+              <AnimatePresence mode='wait'>
+                <motion.img 
+                  key={selectedImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  src={car.images?.[selectedImage] || car.images?.[0] || car.image} 
+                  alt="" 
+                  className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105' 
+                />
+              </AnimatePresence>
+              <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none' />
+              <div className='absolute bottom-8 left-8'>
+                 <span className='px-4 py-1 bg-primary text-white text-[10px] font-black rounded-full uppercase tracking-widest mb-2 inline-block'>Active Deployment</span>
+                 <h1 className='text-4xl md:text-6xl font-black text-white font-heading leading-none'>{car.brand} {car.model}</h1>
+              </div>
+            </motion.div>
+
+            {/* Thumbnail Gallery */}
+            {car.images?.length > 1 && (
+              <div className='flex items-center gap-4 overflow-x-auto pb-4 custom-scrollbar'>
+                {car.images.map((img, index) => (
+                  <button 
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`relative w-24 h-24 rounded-2xl overflow-hidden border-2 transition-all shrink-0 ${selectedImage === index ? 'border-primary shadow-[0_0_20px_rgba(99,102,241,0.4)]' : 'border-white/5 opacity-40 hover:opacity-100'}`}
+                  >
+                    <img src={img} className='w-full h-full object-cover' alt="" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div className='grid grid-cols-2 md:grid-cols-4 gap-6'>
             {[

@@ -100,7 +100,9 @@ const Map = ({ cars = [], selectedCar, onMarkerClick }) => {
                       className='mt-3 w-full py-2.5 bg-primary hover:bg-primary/90 text-white text-[10px] font-black uppercase tracking-widest rounded-lg transition-all active:scale-95'
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.location.href = `/car-details/${car._id}`;
+                        if (car._id) {
+                            window.location.href = `/car-details/${car._id}`;
+                        }
                       }}
                     >
                       Book Now

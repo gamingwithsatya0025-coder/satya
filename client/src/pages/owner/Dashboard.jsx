@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Title from '../../components/owner/Title';
+import PortalTitle from '../../components/PortalTitle';
 import { useAppContext } from '../../context/AppContext';
 import axios from 'axios';
 import { motion } from 'framer-motion';
@@ -53,7 +53,7 @@ const Dashboard = () => {
   return (
     <div className='flex-1 h-screen overflow-y-auto custom-scrollbar'>
       <div className='px-6 pt-12 pb-20 md:px-10 lg:px-16 max-w-7xl mx-auto'>
-      <Title title="Fleet Overview" subTitle="Comprehensive insights into your vehicle performance and rental analytics." />
+      <PortalTitle title="Fleet Overview" subTitle="Comprehensive insights into your vehicle performance and rental analytics." />
       
       {loading ? (
         <div className='py-20 flex justify-center'>

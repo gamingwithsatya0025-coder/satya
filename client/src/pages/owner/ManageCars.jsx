@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { assets } from '../../assets/assets';
-import Title from '../../components/owner/Title';
+import PortalTitle from '../../components/PortalTitle';
 import { useAppContext } from '../../context/AppContext';
 import axios from 'axios';
 import { motion } from 'framer-motion';
@@ -8,10 +8,11 @@ import { motion } from 'framer-motion';
 const ManageCars = () => {
   const { userData, backendUrl, token, cars, fetchCars } = useAppContext();
   const [loading, setLoading] = React.useState(true);
+  const currency = import.meta.env.VITE_CURRENCY || '₹';
   
   const userCars = useMemo(() => {
-    if (cars && userData) {
-        return cars.filter(car => car.owner === userData.id || car.owner?._id === userData.id);
+    if (cars && Array.isArray(cars) && userData) {
+        return cars.filter(car => car && (car.owner === userData.id || car.owner?._id === userData.id || car.owner === userData._id));
     }
     return [];
   }, [cars, userData]);
@@ -40,7 +41,7 @@ const ManageCars = () => {
 
   return (
     <div className='px-4 pt-10 md:px-10 flex-1 h-screen overflow-y-auto custom-scrollbar pb-20'>
-      <Title title="Manage Your Fleet" subTitle="Monitor your listed vehicles and their availability status." />
+      <PortalTitle title="Manage Your Fleet" subTitle="Monitor your listed vehicles and their availability status." />
       
       {loading ? (
         <div className='py-20 flex justify-center'>
@@ -72,7 +73,7 @@ const ManageCars = () => {
                                 <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md ${car.availability ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-500'}`}>
                                     {car.availability ? 'Active' : 'Unavailable'}
                                 </span>
-                                <span className='text-[10px] font-bold uppercase text-white/30 tracking-widest'>ID: {car._id.slice(-6)}</span>
+                                <span className='text-[10px] font-bold uppercase text-white/30 tracking-widest'>ID: {car._id?.slice(-6) || 'NEW'}</span>
                             </div>
                         </div>
                     </div>
@@ -83,10 +84,16 @@ const ManageCars = () => {
                             <p className='text-xl font-black text-primary'>{currency}{car.pricePerDay}</p>
                         </div>
                         <button 
-                            onClick={() => removeCar(car._id)}
-                            className='p-4 rounded-2xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white transition-all duration-300'
+                            onClick={() => window.open(`/car-details/${car._id}`, '_blank')}
+                            className='px-6 h-12 rounded-xl bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] transition-all border border-white/10'
                         >
-                            <img src={assets.delete_icon} alt="Delete" className='w-5 h-5 invert group-hover:brightness-200' />
+                            View Details
+                        </button>
+                        <button 
+                            onClick={() => removeCar(car._id)}
+                            className='p-3.5 rounded-xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white transition-all duration-300 border border-red-500/20'
+                        >
+                            <img src={assets.delete_icon} alt="Delete" className='w-4 h-4 invert group-hover:brightness-200' />
                         </button>
                     </div>
                 </motion.div>

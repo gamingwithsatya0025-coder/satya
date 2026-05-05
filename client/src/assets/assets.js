@@ -96,9 +96,13 @@ export const menuLinks = [
 
 export const ownerMenuLinks = [
     { name: "Dashboard", path: "/owner", icon: dashboardIcon, coloredIcon: dashboardIconColored },
-    { name: "Add car", path: "/owner/add-car", icon: addIcon, coloredIcon: addIconColored },
-    { name: "Manage Cars", path: "/owner/manage-cars", icon: carIcon, coloredIcon: carIconColored },
-    { name: "Manage Bookings", path: "/owner/manage-bookings", icon: listIcon, coloredIcon: listIconColored },
+    { name: "Manage Fleet", path: "/owner/manage-cars", icon: carIcon, coloredIcon: carIconColored },
+    { name: "Booking Requests", path: "/owner/manage-bookings", icon: listIcon, coloredIcon: listIconColored },
+]
+
+export const userMenuLinks = [
+    { name: "Dashboard", path: "/user", icon: dashboardIcon, coloredIcon: dashboardIconColored },
+    { name: "My Bookings", path: "/user/my-bookings", icon: listIcon, coloredIcon: listIconColored },
 ]
 
 export const dummyUserData = {

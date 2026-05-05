@@ -51,13 +51,10 @@ const addCar = async (req, res) => {
 const listCars = async (req, res) => {
     try {
         let cars = await carModel.find({ isApproved: true });
-        if (cars.length === 0) {
-            return res.json({ success: true, cars: sampleCars });
-        }
         res.json({ success: true, cars });
     } catch (error) {
-        console.error("Database unavailable, serving fallback data:", error.message);
-        res.json({ success: true, cars: sampleCars });
+        console.error("Database error:", error.message);
+        res.json({ success: false, message: "Error fetching fleet." });
     }
 }
 
@@ -65,25 +62,14 @@ const listCars = async (req, res) => {
 const getCarDetails = async (req, res) => {
     try {
         const { carId } = req.params;
-        
-        if (carId.startsWith('fallback_')) {
-            const car = sampleCars.find(c => c._id === carId) || sampleCars[0];
-            return res.json({ success: true, car });
-        }
-
         const car = await carModel.findById(carId).populate('owner', 'name email');
         if (!car) {
             return res.json({ success: false, message: "Car not found" });
         }
         res.json({ success: true, car });
     } catch (error) {
-        console.error("Database error, searching in fallback data:", error.message);
-        const { carId } = req.params;
-        const car = sampleCars.find(c => c._id === carId);
-        if (car) {
-            return res.json({ success: true, car });
-        }
-        res.json({ success: false, message: "Car not found in database or fallback data." });
+        console.error("Database error:", error.message);
+        res.json({ success: false, message: "Car not found." });
     }
 }
 

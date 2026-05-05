@@ -57,7 +57,7 @@ const Footer = () => {
                     <ul className="flex flex-col gap-4 text-white/45 font-bold text-sm">
                         <li><Link to="/" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Home Overview</Link></li>
                         <li><Link to="/cars" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Explore Fleet</Link></li>
-                        <li><Link to="/my-bookings" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Manage Bookings</Link></li>
+                        <li><Link to="/user/my-bookings" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Manage Bookings</Link></li>
                         <li><Link to="/about" className="hover:text-primary hover:translate-x-1 transition-all inline-block">About Us</Link></li>
                         <li><Link to="/contact" className="hover:text-primary hover:translate-x-1 transition-all inline-block">Contact</Link></li>
                     </ul>

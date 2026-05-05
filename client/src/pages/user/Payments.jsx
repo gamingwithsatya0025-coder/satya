@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
-import { useAppContext } from '../context/AppContext';
-import PaymentForm from '../components/PaymentForm';
+import { useAppContext } from '../../context/AppContext';
+import PaymentForm from '../../components/PaymentForm';
 
 // Make sure to load Stripe outside of a component’s render
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51TSWruLh33I3O63vpXg234324f2f32f3f');
 
-const SavePaymentMethod = () => {
+const Payments = () => {
   const { backendUrl, token, userData } = useAppContext();
   const [clientSecret, setClientSecret] = useState('');
   const [success, setSuccess] = useState(false);
@@ -87,4 +87,4 @@ const SavePaymentMethod = () => {
   );
 };
 
-export default SavePaymentMethod;
+export default Payments;

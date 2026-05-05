@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Title from '../../components/owner/Title';
+import PortalTitle from '../../components/PortalTitle';
 import { useAppContext } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -124,12 +124,12 @@ const AddCar = () => {
             className='px-4 py-10 md:px-10 flex-1 w-full max-w-5xl mx-auto'
         >
             <div className='flex items-center justify-between mb-8'>
-                <Title title="List Your Vehicle" subTitle="Upload high-quality media and precise details" />
+                <PortalTitle title="List Your Vehicle" subTitle="Upload high-quality media and precise details" />
                 {(!userData?.verificationStatus || userData?.verificationStatus !== 'approved') && (
                     <motion.button 
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        onClick={() => navigate('/owner/verify-identity')}
+                        onClick={() => navigate('/user/verify')}
                         className='hidden md:flex items-center gap-4 px-5 py-3 glass border border-primary/30 rounded-2xl bg-primary/10 hover:bg-primary/20 transition-all group'
                     >
                         <div className='relative'>
