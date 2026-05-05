@@ -83,7 +83,7 @@ const Chatbot = () => {
                 </div>
                 <div>
                   <h3 className="text-white font-black font-heading text-sm uppercase tracking-tight">
-                    Assistant
+                    AI
                   </h3>
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>

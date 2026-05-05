@@ -25,10 +25,10 @@ const handleLocalFallback = async (message) => {
   };
 
   if (query.match(/^(hello|hi|hey|greetings)/)) {
-    return `Hello! I'm your Idle Wheels Concierge. I can help you find luxury vehicles like our ${getCarExamples(cars)}. <br><br> <a href='/cars' style='color:#f59e0b; font-weight:bold; text-decoration:underline;'>Browse our full fleet here</a>`;
+    return `Hello! How can I help you? <br><br> <a href='/cars' style='color:#f59e0b; font-weight:bold; text-decoration:underline;'>Browse our full fleet here</a>`;
   }
 
-  return `I'm your Idle Wheels Assistant. We have elite machines like the ${getCarExamples(cars)} ready for your journey. <br><br> <a href='/cars' style='color:#f59e0b; font-weight:bold; text-decoration:underline;'>View All Cars</a>`;
+  return `I'm here to assist with car discovery and booking. <br><br> <a href='/cars' style='color:#f59e0b; font-weight:bold; text-decoration:underline;'>View All Cars</a>`;
 };
 
 // 🔹 Chat endpoint
@@ -62,19 +62,19 @@ chatRouter.post("/chat", async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `You are the Elite AI Concierge for Idle Wheels. 
+          content: `You are AI for Idle Wheels. 
 
 FORMATTING RULES (CRITICAL):
 1. NO MARKDOWN: NEVER use hashtags (#), asterisks (*), or markdown symbols.
 2. USE HTML ONLY: Use <b> for bolding, <br><br> for paragraph spacing, and <ul>/<li> for lists.
-3. POINT-TO-POINT: Answer in a systematic, point-to-point manner. Each point must be on a new line.
-4. NEATNESS: Ensure clean sentence structure and generous spacing between sections using <br><br>.
+3. CONCISE RESPONSE: Just answer the query directly. DO NOT give extra details or unnecessary information.
+4. POINT-TO-POINT: Answer in a systematic, point-to-point manner.
+5. NEATNESS: Ensure clean sentence structure and generous spacing using <br><br>.
 
 Current Fleet: ${fleetSummary}.
 
 INSTRUCTIONS:
-- Greet as the Elite Concierge.
-- Suggest cars ONLY when explicitly asked.
+- SUGGEST cars ONLY when explicitly asked.
 - Format car suggestions like this:
 <br><br><b>Elite Recommendation:</b><br>BRAND MODEL<br><img src="IMAGE_URL_HERE" style="width:100%; border-radius:15px; margin:15px 0;" alt="Car"><br><a href="LINK_URL_HERE" style="color:#f59e0b; font-weight:bold; text-decoration:underline;">View Elite Specs</a><br><br>`,
         },

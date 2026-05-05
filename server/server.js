@@ -80,7 +80,7 @@ app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'active', database: 'connected', timestamp: new Date() });
 });
 
-const distPath = path.join(__dirname, '../client/dist');
+const distPath = path.join(process.cwd(), 'client', 'dist');
 app.use(express.static(distPath));
 
 app.get(/.*$/, (req, res) => {
