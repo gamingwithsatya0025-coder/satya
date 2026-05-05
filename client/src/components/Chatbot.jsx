@@ -73,7 +73,7 @@ const Chatbot = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className={`w-[340px] md:w-[380px] rounded-[2rem] border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col mb-4 bg-[#0a0f1a]/95 backdrop-blur-2xl ${isMinimized ? "h-[68px]" : "h-[480px]"}`}
+            className={`w-[380px] md:w-[480px] rounded-[2.5rem] border border-white/10 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col mb-4 bg-[#0a0f1a]/98 backdrop-blur-3xl transition-all duration-500 ${isMinimized ? "h-[80px]" : "h-[650px]"}`}
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-primary to-secondary p-5 flex items-center justify-between">
@@ -128,8 +128,14 @@ const Chatbot = () => {
                         }`}
                       >
                         <div
+                          className="leading-relaxed font-medium font-heading tracking-tight text-white/90 chatbot-content"
                           dangerouslySetInnerHTML={{ __html: c.text }}
                         />
+                        <style>{`
+                          .chatbot-content ul { list-style-type: disc; margin-left: 1.2rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+                          .chatbot-content li { margin-bottom: 0.4rem; }
+                          .chatbot-content b { color: #fff; font-weight: 900; display: inline-block; margin-top: 0.2rem; }
+                        `}</style>
                       </div>
                     </motion.div>
                   ))}
