@@ -81,6 +81,7 @@ const App = () => {
                 <Route path="manage-cars" element={<ManageCars />} />
                 <Route path="manage-bookings" element={<ManageBookings />} />
                 <Route path="add-car" element={<AddCar />} />
+                <Route path="verify" element={<Verify />} />
               </Route>
             </Routes>
           </motion.div>
