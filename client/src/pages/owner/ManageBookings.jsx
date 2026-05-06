@@ -5,13 +5,14 @@ import PortalTitle from '../../components/PortalTitle';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { assets } from '../../assets/assets';
-import { ShieldCheck, AlertTriangle, MessageSquare, Info, X, Fingerprint, FileText } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, MessageSquare, Info, X, Fingerprint, FileText, Maximize2 } from 'lucide-react';
 
 const ManageBookings = () => {
     const { userData, backendUrl, token } = useAppContext();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [fullScreenImage, setFullScreenImage] = useState(null);
     const currency = import.meta.env.VITE_CURRENCY;
 
     const fetchAllBookings = useCallback(async () => {
@@ -213,9 +214,20 @@ const ManageBookings = () => {
                                         <span className='text-[10px] font-black uppercase tracking-widest text-white/40'>Aadhaar Identification</span>
                                     </div>
                                     <p className='text-xl font-black text-white tracking-[0.3em] uppercase'>{selectedUser.aadhaarNumber || 'NOT PROVIDED'}</p>
-                                    <div className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative'>
+                                    <div 
+                                        className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative cursor-pointer'
+                                        onClick={() => setFullScreenImage(selectedUser.aadhaarImage)}
+                                    >
                                         {selectedUser.aadhaarImage ? (
-                                            <img src={selectedUser.aadhaarImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="Aadhaar" />
+                                            <>
+                                                <img src={selectedUser.aadhaarImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="Aadhaar" />
+                                                <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm'>
+                                                    <div className='flex flex-col items-center gap-2'>
+                                                        <Maximize2 className='w-8 h-8 text-white' />
+                                                        <span className='text-[10px] font-black uppercase tracking-[0.2em] text-white'>View Full Size</span>
+                                                    </div>
+                                                </div>
+                                            </>
                                         ) : (
                                             <div className='absolute inset-0 flex flex-col items-center justify-center gap-3'>
                                                 <AlertTriangle className='w-6 h-6 text-white/10' />
@@ -232,9 +244,20 @@ const ManageBookings = () => {
                                         <span className='text-[10px] font-black uppercase tracking-widest text-white/40'>PAN Verification</span>
                                     </div>
                                     <p className='text-xl font-black text-white tracking-[0.3em] uppercase'>{selectedUser.panNumber || 'NOT PROVIDED'}</p>
-                                    <div className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative'>
+                                    <div 
+                                        className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative cursor-pointer'
+                                        onClick={() => setFullScreenImage(selectedUser.panImage)}
+                                    >
                                         {selectedUser.panImage ? (
-                                            <img src={selectedUser.panImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="PAN" />
+                                            <>
+                                                <img src={selectedUser.panImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="PAN" />
+                                                <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm'>
+                                                    <div className='flex flex-col items-center gap-2'>
+                                                        <Maximize2 className='w-8 h-8 text-white' />
+                                                        <span className='text-[10px] font-black uppercase tracking-[0.2em] text-white'>View Full Size</span>
+                                                    </div>
+                                                </div>
+                                            </>
                                         ) : (
                                             <div className='absolute inset-0 flex flex-col items-center justify-center gap-3'>
                                                 <AlertTriangle className='w-6 h-6 text-white/10' />
@@ -251,9 +274,20 @@ const ManageBookings = () => {
                                         <span className='text-[10px] font-black uppercase tracking-widest text-white/40'>Driving Authorization</span>
                                     </div>
                                     <p className='text-xl font-black text-white tracking-[0.3em] uppercase'>{selectedUser.drivingLicenceNumber || 'NOT PROVIDED'}</p>
-                                    <div className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative'>
+                                    <div 
+                                        className='aspect-video rounded-3xl overflow-hidden border border-white/10 bg-black/40 group relative cursor-pointer'
+                                        onClick={() => setFullScreenImage(selectedUser.drivingLicenceImage)}
+                                    >
                                         {selectedUser.drivingLicenceImage ? (
-                                            <img src={selectedUser.drivingLicenceImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="License" />
+                                            <>
+                                                <img src={selectedUser.drivingLicenceImage} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-700' alt="License" />
+                                                <div className='absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm'>
+                                                    <div className='flex flex-col items-center gap-2'>
+                                                        <Maximize2 className='w-8 h-8 text-white' />
+                                                        <span className='text-[10px] font-black uppercase tracking-[0.2em] text-white'>View Full Size</span>
+                                                    </div>
+                                                </div>
+                                            </>
                                         ) : (
                                             <div className='absolute inset-0 flex flex-col items-center justify-center gap-3'>
                                                 <AlertTriangle className='w-6 h-6 text-white/10' />
@@ -271,6 +305,42 @@ const ManageBookings = () => {
                             </div>
                         </motion.div>
                     </div>
+                )}
+            </AnimatePresence>
+
+            {/* Full Screen Image Viewer */}
+            <AnimatePresence>
+                {fullScreenImage && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className='fixed inset-0 z-[200] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 md:p-20'
+                        onClick={() => setFullScreenImage(null)}
+                    >
+                        <motion.button 
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className='absolute top-8 right-8 w-16 h-16 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 group z-[210]'
+                            onClick={() => setFullScreenImage(null)}
+                        >
+                            <X className='w-8 h-8 text-white/40 group-hover:text-white group-hover:rotate-90 transition-all' />
+                        </motion.button>
+
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className='relative w-full h-full flex items-center justify-center'
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img 
+                                src={fullScreenImage} 
+                                alt="Full Screen Credential" 
+                                className='max-w-full max-h-full object-contain rounded-2xl shadow-[0_0_100px_rgba(0,0,0,0.5)] border border-white/5'
+                            />
+                        </motion.div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>
